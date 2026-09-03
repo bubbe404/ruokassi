@@ -1,0 +1,13 @@
+{
+  "name": "ruokassi",
+  "short_name": "ruokassi",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f0",
+  "theme_color": "#2f6b4c",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
