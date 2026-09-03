@@ -1,0 +1,19 @@
+# secrets never belong in the repo — they live in GitHub Actions secrets
+.env
+.env.*
+*.key
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# local receipt samples (never commit personal data)
+*.eml
+ingest/samples/
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
