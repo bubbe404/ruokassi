@@ -80,6 +80,10 @@
   .badge.due{background:var(--warn-soft);color:var(--warn)}
   .badge.changed{background:var(--accent-soft);color:var(--accent-ink)}
   .qty{font-family:var(--mono);font-weight:600;color:var(--accent-ink);min-width:30px;text-align:right}
+  .bychip{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;font-family:var(--mono);font-size:.56rem;font-weight:600;color:#fff}
+  .bychip.auto{width:auto;height:auto;border-radius:5px;padding:1px 6px;background:var(--surface-2);color:var(--faint);border:1px solid var(--line)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;color:var(--faint);margin:12px 2px 0;align-items:center}
+  .legend span{display:inline-flex;gap:5px;align-items:center}
 
   /* basket */
   .cbx{width:22px;height:22px;flex:none;border:1.5px solid var(--line-strong);border-radius:6px;display:grid;place-items:center;color:#fff;background:var(--surface)}
@@ -163,7 +167,8 @@
       <ul class="results" id="addResults"></ul>
       <div id="sugWrap"></div>
       <div class="copybar"><button class="copybtn" id="copyBtn">Copy checked items</button></div>
-      <p class="hint">Your standing weekly basket. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week.</p>
+      <div class="legend"><span><span class="bychip auto">auto</span> from your history</span><span><span class="bychip" style="background:hsl(210 45% 42%)">M</span> who added it</span></div>
+      <p class="hint">Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.</p>
     </section>
 
     <section id="due" hidden>
@@ -214,7 +219,7 @@ async function boot(){
 function render(session){
   const authed=!!session;
   $('#login').hidden=authed; $('#app').hidden=!authed;
-  if(authed) loadAll();
+  if(authed){ ME=session.user?.email||''; loadAll(); }
 }
 $('#loginForm').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -232,8 +237,15 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('clic
   ['dash','basket','due','missing'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
 }));
 
+let ME='';
 let loaded=false;
 function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadBasket(); loadDue(); loadMissing(); }
+function hue(s){ let h=0; for(const c of (s||'')) h=(h*31+c.charCodeAt(0))%360; return h; }
+function byChip(by){
+  if(!by || by==='auto') return '<span class="bychip auto">auto</span>';
+  const label=(by.split('@')[0]||'?'); const init=(label[0]||'?').toUpperCase();
+  return `<span class="bychip" style="background:hsl(${hue(by)} 45% 42%)" title="added by ${by}">${init}</span>`;
+}
 
 // ---------- OVERVIEW ----------
 async function loadDash(){
@@ -280,7 +292,7 @@ async function toggleOrder(li){
 let basket=[];   // [{product_id, default_qty, name, checked, due}]
 async function loadBasket(){
   const { data, error } = await q(()=>sb.from('standard_basket')
-    .select('product_id,default_qty,products(name)'));
+    .select('product_id,default_qty,added_by,products(name)'));
   if(error) return fail('#basketList',error);
   const ids=data.map(r=>r.product_id);
   let dueMap={};
@@ -288,8 +300,8 @@ async function loadBasket(){
     const fr=await q(()=>sb.from('product_frequency').select('product_id,due_ratio').in('product_id',ids));
     (fr.data||[]).forEach(f=>dueMap[f.product_id]=f.due_ratio);
   }
-  basket=data.map(r=>({product_id:r.product_id, default_qty:Number(r.default_qty),
-    name:r.products?.name||'?', checked:true, due:(dueMap[r.product_id]||0)>=0.8}))
+  basket=data.map(r=>({product_id:r.product_id, default_qty:Math.round(Number(r.default_qty)),
+    name:r.products?.name||'?', checked:true, by:r.added_by||'auto', due:(dueMap[r.product_id]||0)>=0.8}))
     .sort((a,b)=>a.name.localeCompare(b.name));
   renderBasket();
   loadSuggestions(ids);
@@ -301,7 +313,7 @@ function renderBasket(){
     <div class="rowline">
       <div class="cbx ${b.checked?'on':''}" data-chk="${i}"><svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="row-main"><div class="row-title">${cap(b.name)}</div>
-        ${b.due?'<div class="row-sub"><span class="badge due" style="padding:1px 6px">due</span></div>':''}</div>
+        <div class="row-sub" style="display:flex;gap:6px;align-items:center;margin-top:5px">${byChip(b.by)}${b.due?'<span class="badge due" style="padding:1px 6px">due</span>':''}</div></div>
       <div class="stepper">
         <button data-dec="${i}">–</button><span class="qv">${trimQty(b.default_qty)}</span><button data-inc="${i}">+</button>
       </div>
@@ -331,7 +343,7 @@ async function loadSuggestions(inIds){
       <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">+ add</button>
     </div></li>`).join('')+`</ul>`;
   $('#sugWrap').querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',async()=>{
-    await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:round1(Number(btn.dataset.q)||1)}));
+    await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:Math.max(1,Math.round(Number(btn.dataset.q)||1)), added_by:ME}));
     toast('Added to basket'); loadBasket();
   }));
 }
@@ -348,7 +360,7 @@ $('#addSearch').addEventListener('input', e=>{
       <span class="row-title">${cap(p.name)}</span>
       <button class="addbtn" data-padd="${p.id}">+ add</button></li>`).join('');
     $('#addResults').querySelectorAll('[data-padd]').forEach(btn=>btn.addEventListener('click',async()=>{
-      await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1}));
+      await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1, added_by:ME}));
       $('#addSearch').value=''; $('#addResults').innerHTML=''; toast('Added to basket'); loadBasket();
     }));
   },250);
