@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -152,10 +152,10 @@
 
 <div id="login" class="login" hidden>
   <div class="brand"><span class="dot"></span>ruokassi</div>
-  <p>Weekly food, at a glance.</p>
+  <p>Viikon ruoat yhdellä silmäyksellä.</p>
   <form id="loginForm">
-    <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required>
-    <button class="btn" id="loginBtn" type="submit">Email me a login link</button>
+    <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="sinä@esimerkki.fi" required>
+    <button class="btn" id="loginBtn" type="submit">Lähetä kirjautumislinkki</button>
   </form>
   <div class="msg" id="loginMsg"></div>
 </div>
@@ -163,61 +163,61 @@
 <div id="app" hidden>
   <header><div class="bar">
     <div class="brand"><span class="dot"></span>ruokassi</div>
-    <button class="signout" id="signout">Sign out</button>
+    <button class="signout" id="signout">Kirjaudu ulos</button>
   </div></header>
   <div class="wrap">
     <nav class="tabs" role="tablist">
-      <button role="tab" data-tab="plan" aria-selected="true" class="primary">Plan</button>
-      <button role="tab" data-tab="basket" aria-selected="false" class="primary">Basket</button>
-      <button role="tab" data-tab="dash" aria-selected="false" class="minor">Orders</button>
-      <button role="tab" data-tab="due" aria-selected="false" class="minor">Due</button>
+      <button role="tab" data-tab="plan" aria-selected="true" class="primary">Suunnittelu</button>
+      <button role="tab" data-tab="basket" aria-selected="false" class="primary">Kori</button>
+      <button role="tab" data-tab="dash" aria-selected="false" class="minor">Tilaukset</button>
+      <button role="tab" data-tab="due" aria-selected="false" class="minor">Loppumassa</button>
     </nav>
 
     <section id="dash" hidden>
       <div class="stats" id="dashStats"></div>
-      <h2>Recent orders <span class="sub">tap to expand</span></h2>
-      <ul class="list" id="ordersList"><li class="rowline skeleton">Loading…</li></ul>
+      <h2>Viimeisimmät tilaukset <span class="sub">napauta avataksesi</span></h2>
+      <ul class="list" id="ordersList"><li class="rowline skeleton">Ladataan…</li></ul>
     </section>
 
     <section id="basket" hidden>
       <div id="missWrap"></div>
       <div id="menuWrap"></div>
-      <h2>Weekly basket <span class="sub" id="basketCount"></span></h2>
-      <ul class="list" id="basketList"><li class="rowline skeleton">Loading…</li></ul>
+      <h2>Viikkokori <span class="sub" id="basketCount"></span></h2>
+      <ul class="list" id="basketList"><li class="rowline skeleton">Ladataan…</li></ul>
       <div class="searchbar">
-        <input id="addSearch" type="text" placeholder="Add an item to your basket…">
+        <input id="addSearch" type="text" placeholder="Lisää tuote koriin…">
       </div>
       <ul class="results" id="addResults"></ul>
       <div id="sugWrap"></div>
-      <div class="copybar"><button class="copybtn" id="copyBtn">Copy checked items</button></div>
-      <div class="legend"><span><span class="bychip auto">auto</span> from your history</span><span><span class="bychip" style="background:hsl(210 45% 42%)">M</span> who added it</span></div>
-      <p class="hint">Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.</p>
+      <div class="copybar"><button class="copybtn" id="copyBtn">Kopioi valitut</button></div>
+      <div class="legend"><span><span class="bychip auto">auto</span> historian perusteella</span><span><span class="bychip" style="background:hsl(210 45% 42%)">M</span> kuka lisäsi</span></div>
+      <p class="hint">Vakioviikkokorisi kappaleina. Rastita mitä tarvitset tällä viikolla, säädä määriä ja kopioi lista S-kauppaan. Muutokset tallentuvat ensi viikoksi. Painon mukaan myytäviä ei voi laskea automaattisesti, joten ne alkavat pieninä — aseta kerran ja ne pysyvät.</p>
     </section>
 
     <section id="plan">
-      <h2>This week <span class="sub" id="weekLabel"></span></h2>
+      <h2>Tämä viikko <span class="sub" id="weekLabel"></span></h2>
       <div class="scope">
-        <div class="scoperow"><span>Dinners to plan</span>
+        <div class="scoperow"><span>Illallisia suunnitteilla</span>
           <div class="stepper"><button id="dinDec">–</button><span class="qv" id="dinN">5</span><button id="dinInc">+</button></div></div>
-        <label class="scoperow"><span>Include lunches</span><input type="checkbox" id="lunch"></label>
+        <label class="scoperow"><span>Sisällytä lounaat</span><input type="checkbox" id="lunch"></label>
       </div>
-      <input id="planNote" class="noteinput" placeholder="This week: guests, away, eating out…">
+      <input id="planNote" class="noteinput" placeholder="Tällä viikolla: vieraita, matkoilla, ulkona syöntiä…">
       <div class="rulepanel" id="rulePanel"></div>
 
-      <h2 style="margin-top:20px">Menu <span class="sub" id="menuCount"></span></h2>
+      <h2 style="margin-top:20px">Ruokalista <span class="sub" id="menuCount"></span></h2>
       <ul class="list" id="menuList"></ul>
 
-      <h2 style="margin-top:24px">Recipes <span class="sub" id="recCount"></span></h2>
-      <button class="addbtn" id="newRecipeBtn">+ New recipe</button>
+      <h2 style="margin-top:24px">Reseptit <span class="sub" id="recCount"></span></h2>
+      <button class="addbtn" id="newRecipeBtn">+ Uusi resepti</button>
       <div id="recipeForm" hidden></div>
       <ul class="list" id="recipeList" style="margin-top:10px"></ul>
-      <p class="hint">Your family's go-to meals. Pick this week's dinners into the menu — the chips above check your house rules live. Ingredients flowing into the Basket comes in the next update.</p>
+      <p class="hint">Perheen vakioruoat. Valitse viikon illalliset ruokalistalle — ylläolevat merkit tarkistavat talon säännöt reaaliajassa. Reseptin ainekset siirtyvät automaattisesti Koriin.</p>
     </section>
 
     <section id="due" hidden>
-      <h2>Due to reorder</h2>
-      <ul class="list" id="dueList"><li class="rowline skeleton">Loading…</li></ul>
-      <p class="hint">Staples bought in ≥25% of orders and now past their usual interval. Suggested quantity is your median.</p>
+      <h2>Loppumassa</h2>
+      <ul class="list" id="dueList"><li class="rowline skeleton">Ladataan…</li></ul>
+      <p class="hint">Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.</p>
     </section>
 
   </div>
@@ -263,11 +263,11 @@ function render(session){
 $('#loginForm').addEventListener('submit', async e=>{
   e.preventDefault();
   const email=$('#email').value.trim(), btn=$('#loginBtn'), msg=$('#loginMsg');
-  msg.className='msg'; msg.textContent=''; btn.disabled=true; btn.textContent='Sending…';
+  msg.className='msg'; msg.textContent=''; btn.disabled=true; btn.textContent='Lähetetään…';
   const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
-  btn.disabled=false; btn.textContent='Email me a login link';
+  btn.disabled=false; btn.textContent='Lähetä kirjautumislinkki';
   if(error){ msg.className='msg err'; msg.textContent=error.message; }
-  else msg.textContent='Check your inbox for the link ✉️';
+  else msg.textContent='Tarkista sähköpostisi — linkki on matkalla ✉️';
 });
 $('#signout').addEventListener('click', ()=>sb.auth.signOut());
 
@@ -283,7 +283,7 @@ function hue(s){ let h=0; for(const c of (s||'')) h=(h*31+c.charCodeAt(0))%360; 
 function byChip(by){
   if(!by || by==='auto') return '<span class="bychip auto">auto</span>';
   const label=(by.split('@')[0]||'?'); const init=(label[0]||'?').toUpperCase();
-  return `<span class="bychip" style="background:hsl(${hue(by)} 45% 42%)" title="added by ${by}">${init}</span>`;
+  return `<span class="bychip" style="background:hsl(${hue(by)} 45% 42%)" title="lisännyt ${by}">${init}</span>`;
 }
 
 // ---------- OVERVIEW ----------
@@ -295,14 +295,14 @@ async function loadDash(){
   const recent=data.slice(0,8);
   const avg=recent.reduce((s,o)=>s+Number(o.order_total_eur||0),0)/(recent.length||1);
   $('#dashStats').innerHTML =
-    tile(eur.format(data[0]?.order_total_eur||0),'last order')+
-    tile(eur.format(avg),'avg (last 8)')+
-    tile(String(data.length)+'+','orders');
+    tile(eur.format(data[0]?.order_total_eur||0),'viime tilaus')+
+    tile(eur.format(avg),'ka (viim. 8)')+
+    tile(String(data.length)+'+','tilausta');
   $('#ordersList').innerHTML = data.map(o=>`<li data-order="${o.order_id}">
       <div class="rowline tap">
         <div class="row-main"><div class="row-title">${fmtDate(o.order_date)}</div>
-          <div class="row-sub">${o.num_food_items} items</div></div>
-        ${o.receipt_type==='changed'?'<span class="badge changed">substituted</span>':''}
+          <div class="row-sub">${o.num_food_items} tuotetta</div></div>
+        ${o.receipt_type==='changed'?'<span class="badge changed">korvattu</span>':''}
         <div class="row-val">${eur.format(o.order_total_eur||0)}</div>
         <span class="chev">▶</span>
       </div>
@@ -316,7 +316,7 @@ async function toggleOrder(li){
   const open=li.classList.toggle('open');
   const box=li.querySelector('[data-items]');
   if(open && !box.dataset.loaded){
-    box.dataset.loaded='1'; box.innerHTML='<div class="row-sub">Loading…</div>';
+    box.dataset.loaded='1'; box.innerHTML='<div class="row-sub">Ladataan…</div>';
     const { data, error } = await q(()=>sb.from('order_items')
       .select('product_name_raw,qty,unit,net_eur,is_fee')
       .eq('order_id',li.dataset.order).order('line_no'));
@@ -351,8 +351,8 @@ async function loadBasket(){
   loadMenuSection();
 }
 function renderBasket(){
-  $('#basketCount').textContent = basket.length+' items';
-  if(!basket.length){ $('#basketList').innerHTML='<li class="rowline muted" style="padding:18px 15px">Basket is empty — add items below.</li>'; return; }
+  $('#basketCount').textContent = basket.length+' tuotetta';
+  if(!basket.length){ $('#basketList').innerHTML='<li class="rowline muted" style="padding:18px 15px">Kori on tyhjä — lisää tuotteita alta.</li>'; return; }
   $('#basketList').innerHTML = basket.map((b,i)=>`<li>
     <div class="rowline">
       <div class="cbx ${b.checked?'on':''}" data-chk="${i}"><svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -369,7 +369,7 @@ $('#basketList').addEventListener('click', async e=>{
   if(t.dataset.chk!=null){ const i=+t.dataset.chk; basket[i].checked=!basket[i].checked; renderBasket(); }
   else if(t.dataset.inc!=null){ const i=+t.dataset.inc; basket[i].default_qty=round1(basket[i].default_qty+1); renderBasket(); saveQty(basket[i]); }
   else if(t.dataset.dec!=null){ const i=+t.dataset.dec; basket[i].default_qty=Math.max(0,round1(basket[i].default_qty-1)); renderBasket(); saveQty(basket[i]); }
-  else if(t.dataset.rm!=null){ const b=basket[+t.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast('Removed '+cap(b.name)); loadBasket(); }
+  else if(t.dataset.rm!=null){ const b=basket[+t.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast('Poistettu '+cap(b.name)); loadBasket(); }
 });
 const round1=x=>Math.round(x*10)/10;
 async function saveQty(b){ await q(()=>sb.from('standard_basket').update({default_qty:b.default_qty}).eq('product_id',b.product_id)); }
@@ -381,14 +381,14 @@ async function loadSuggestions(inIds){
     .order('due_ratio',{ascending:false}).limit(20));
   const sug=(data||[]).filter(s=>!inIds.includes(s.product_id)).slice(0,8);
   if(!sug.length){ $('#sugWrap').innerHTML=''; return; }
-  $('#sugWrap').innerHTML = `<h2 style="margin-top:22px">Due, not in your basket <span class="sub">${sug.length}</span></h2>
+  $('#sugWrap').innerHTML = `<h2 style="margin-top:22px">Loppumassa, ei korissa <span class="sub">${sug.length}</span></h2>
     <ul class="list">`+sug.map(s=>`<li><div class="rowline">
       <div class="row-main"><div class="row-title">${cap(s.product)}</div></div>
-      <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">+ add</button>
+      <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">+ lisää</button>
     </div></li>`).join('')+`</ul>`;
   $('#sugWrap').querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',async()=>{
     await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:Math.max(1,Math.round(Number(btn.dataset.q)||1)), added_by:ME}));
-    toast('Added to basket'); loadBasket();
+    toast('Lisätty koriin'); loadBasket();
   }));
 }
 
@@ -402,10 +402,10 @@ $('#addSearch').addEventListener('input', e=>{
       .ilike('name','%'+term+'%').order('name').limit(12));
     $('#addResults').innerHTML=(data||[]).map(p=>`<li>
       <span class="row-title">${cap(p.name)}</span>
-      <button class="addbtn" data-padd="${p.id}">+ add</button></li>`).join('');
+      <button class="addbtn" data-padd="${p.id}">+ lisää</button></li>`).join('');
     $('#addResults').querySelectorAll('[data-padd]').forEach(btn=>btn.addEventListener('click',async()=>{
       await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1, added_by:ME}));
-      $('#addSearch').value=''; $('#addResults').innerHTML=''; toast('Added to basket'); loadBasket();
+      $('#addSearch').value=''; $('#addResults').innerHTML=''; toast('Lisätty koriin'); loadBasket();
     }));
   },250);
 });
@@ -416,10 +416,10 @@ $('#copyBtn').addEventListener('click',()=>{
     ...menuItems.filter(m=>m.checked).map(m=>`${m.qty?trimQty(m.qty)+' × ':''}${cap(m.name)}`),
     ...basket.filter(b=>b.checked).map(b=>`${trimQty(b.default_qty)} × ${cap(b.name)}`),
   ];
-  if(!lines.length){ toast('Nothing checked'); return; }
+  if(!lines.length){ toast('Ei valintoja'); return; }
   const text=lines.join('\n');
-  navigator.clipboard.writeText(text).then(()=>toast(lines.length+' items copied'))
-    .catch(()=>{ prompt('Copy your list:', text); });
+  navigator.clipboard.writeText(text).then(()=>toast(lines.length+' tuotetta kopioitu'))
+    .catch(()=>{ prompt('Kopioi lista:', text); });
 });
 
 // ---------- DUE ----------
@@ -428,11 +428,11 @@ async function loadDue(){
     .select('product,last_ordered,days_since_last,median_days_between,median_qty,due_ratio,pct_of_orders')
     .gte('pct_of_orders',0.25).gte('due_ratio',0.8).order('due_ratio',{ascending:false}).limit(60));
   if(error) return fail('#dueList',error);
-  if(!data.length){ $('#dueList').innerHTML='<li class="empty"><span class="big">✅</span>Nothing due right now.</li>'; return; }
+  if(!data.length){ $('#dueList').innerHTML='<li class="empty"><span class="big">✅</span>Mikään ei ole loppumassa juuri nyt.</li>'; return; }
   $('#dueList').innerHTML=data.map(p=>`<li><div class="rowline">
       <div class="row-main"><div class="row-title">${cap(p.product)}</div>
-        <div class="row-sub">last ${fmtDate(p.last_ordered)} · every ~${Math.round(p.median_days_between)} d</div></div>
-      <span class="badge due">${p.days_since_last}/${Math.round(p.median_days_between)} d</span>
+        <div class="row-sub">viimeksi ${fmtDate(p.last_ordered)} · noin ${Math.round(p.median_days_between)} pv välein</div></div>
+      <span class="badge due">${p.days_since_last}/${Math.round(p.median_days_between)} pv</span>
       <div class="qty">×${trimQty(p.median_qty)}</div>
     </div></li>`).join('');
 }
@@ -452,12 +452,12 @@ async function loadMissingSection(){
 function renderMissingSection(){
   const w=$('#missWrap'); if(!w) return;
   if(!missWeek.length){ w.innerHTML=''; return; }
-  w.innerHTML=`<h2 style="margin-top:4px">Missing from last order <span class="badge miss">${missWeek.length}</span></h2>
-    <p class="hint" style="margin:0 2px 10px">Out of stock ${fmtDate(missLatest)} — re-add here or grab in store.</p>
+  w.innerHTML=`<h2 style="margin-top:4px">Puuttui viime tilauksesta <span class="badge miss">${missWeek.length}</span></h2>
+    <p class="hint" style="margin:0 2px 10px">Loppu kaupasta ${fmtDate(missLatest)} — lisää tähän tai hae myymälästä.</p>
     <ul class="list">`+missWeek.map((m,i)=>`<li><div class="rowline">
       <div class="cbx ${m.checked?'on':''}" data-mchk="${i}">${CHK}</div>
       <div class="row-main"><div class="row-title">${cap(m.name)}</div></div>
-      <span class="badge miss" style="padding:1px 6px">missing</span>
+      <span class="badge miss" style="padding:1px 6px">puuttui</span>
       <div class="qty">×${trimQty(m.qty)}</div></div></li>`).join('')+`</ul>`;
 }
 $('#missWrap').addEventListener('click',e=>{
@@ -471,11 +471,11 @@ async function loadMenuSection(){
   const mp=await q(()=>sb.from('meal_plans').select('id').eq('week_start',ws).limit(1));
   const planId=mp.data && mp.data[0] && mp.data[0].id;
   if(!planId){ menuItems=[]; unresolved=[]; $('#menuWrap').innerHTML=''; return; }
-  const sl=await q(()=>sb.from('meal_plan_slots').select('recipe_id,recipes(name)').eq('plan_id',planId));
+  const sl=await q(()=>sb.from('meal_plan_slots').select('recipe_id,recipes(name,batch)').eq('plan_id',planId));
   const rows=sl.data||[];
   if(!rows.length){ menuItems=[]; unresolved=[]; $('#menuWrap').innerHTML=''; return; }
   const rids=[...new Set(rows.map(r=>r.recipe_id))];
-  const nameById={}; rows.forEach(r=>{ if(r.recipes) nameById[r.recipe_id]=r.recipes.name; });
+  const nameById={}, batchById={}; rows.forEach(r=>{ if(r.recipes){ nameById[r.recipe_id]=r.recipes.name; batchById[r.recipe_id]=r.recipes.batch||1; } });
   const ing=await q(()=>sb.from('recipe_ingredients')
     .select('recipe_id,line_text,ingredient_key,qty,product_id,is_pantry,products(name)').in('recipe_id',rids));
   const list=(ing.data||[]).filter(x=>!x.is_pantry);
@@ -488,14 +488,15 @@ async function loadMenuSection(){
   const byPid={}, unByKey={};
   list.forEach(x=>{
     const recipe=nameById[x.recipe_id]||'';
+    const bq = x.qty!=null ? x.qty*(batchById[x.recipe_id]||1) : null;
     let pid=x.product_id, nm=x.products?.name;
     if(!pid && x.ingredient_key && mapByKey[x.ingredient_key]){ pid=mapByKey[x.ingredient_key].product_id; nm=mapByKey[x.ingredient_key].name; }
     if(pid){
       if(byPid[pid]){ const e=byPid[pid]; e.qty=null; if(recipe && !e.recipe.includes(recipe)) e.recipe+=', '+recipe; }
-      else byPid[pid]={key:x.ingredient_key, name:nm||x.line_text, qty:x.qty, product_id:pid, checked:true, recipe};
+      else byPid[pid]={key:x.ingredient_key, name:nm||x.line_text, qty:bq, product_id:pid, checked:true, recipe};
     } else {
       const k=x.ingredient_key||normKey(x.line_text);
-      if(!unByKey[k]) unByKey[k]={key:k, name:x.line_text, qty:x.qty, recipe};
+      if(!unByKey[k]) unByKey[k]={key:k, name:x.line_text, qty:bq, recipe};
       else if(recipe && !unByKey[k].recipe.includes(recipe)) unByKey[k].recipe+=', '+recipe;
     }
   });
@@ -505,7 +506,7 @@ async function loadMenuSection(){
 function renderMenuSection(){
   const w=$('#menuWrap'); if(!w) return;
   if(!menuItems.length && !unresolved.length){ w.innerHTML=''; return; }
-  let html=`<h2 style="margin-top:4px">From this week's menu <span class="sub">${menuItems.length+unresolved.length}</span></h2>`;
+  let html=`<h2 style="margin-top:4px">Tämän viikon ruokalistalta <span class="sub">${menuItems.length+unresolved.length}</span></h2>`;
   if(menuItems.length){
     html+=`<ul class="list">`+menuItems.map((m,i)=>`<li><div class="rowline">
       <div class="cbx ${m.checked?'on':''}" data-nchk="${i}">${CHK}</div>
@@ -514,10 +515,10 @@ function renderMenuSection(){
       ${m.qty?`<div class="qty">×${trimQty(m.qty)}</div>`:''}</div></li>`).join('')+`</ul>`;
   }
   if(unresolved.length){
-    html+=`<p class="hint" style="margin:12px 2px 8px">Match a product once and ruokassi remembers it:</p>`+
+    html+=`<p class="hint" style="margin:12px 2px 8px">Yhdistä tuote kerran, niin ruokassi muistaa sen:</p>`+
     `<ul class="list">`+unresolved.map((u,i)=>`<li><div style="padding:10px 15px">
       <div class="row-title">${esc(u.name)}${u.recipe?` <span class="muted" style="font-size:.72rem">· ${esc(u.recipe)}</span>`:''}</div>
-      <input class="finput nres" data-key="${esc(u.key)}" placeholder="match a product…" style="margin-top:6px">
+      <input class="finput nres" data-key="${esc(u.key)}" placeholder="yhdistä tuote…" style="margin-top:6px">
       <ul class="list nres-res"></ul></div></li>`).join('')+`</ul>`;
   }
   w.innerHTML=html;
@@ -538,13 +539,13 @@ $('#menuWrap').addEventListener('input',e=>{
     const { data } = await q(()=>sb.from('products').select('id,name').ilike('name','%'+term+'%').order('name').limit(8));
     resUl.innerHTML=(data||[]).map(p=>`<li><div class="rowline">
       <div class="row-main"><div class="row-title">${cap(p.name)}</div></div>
-      <button class="addbtn" data-pick="${p.id}" data-key="${esc(key)}">use</button></div></li>`).join('');
+      <button class="addbtn" data-pick="${p.id}" data-key="${esc(key)}">valitse</button></div></li>`).join('');
   },250);
 });
 async function resolveKey(key, pid){
   await q(()=>sb.from('ingredient_product_map').upsert({ingredient_key:key, product_id:pid, last_used_at:new Date().toISOString()},{onConflict:'ingredient_key'}));
   await q(()=>sb.from('recipe_ingredients').update({product_id:pid}).eq('ingredient_key',key).is('product_id',null));
-  toast('Matched — remembered'); loadMenuSection();
+  toast('Yhdistetty — muistissa'); loadMenuSection();
 }
 
 // helpers
@@ -557,6 +558,7 @@ const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'
 function monday(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
 function normKey(l){ return (l||'').toLowerCase().replace(/^[\s\d.,/-]+/,'').replace(/^(g|kg|dl|l|ml|kpl|tl|rkl|prk|ps|pkt|ras|pkl)\b\.?\s*/,'').trim().split(/\s+/).slice(0,2).join(' '); }
 function parseQty(l){ const m=(l||'').match(/^\s*([\d.,]+)/); return m? Number(m[1].replace(',','.')) : null; }
+function parseUnit(l){ const m=(l||'').match(/^\s*[\d.,]+\s*(kg|g|dl|ml|l|kpl|tl|rkl|prk|pkt|ras|pss|tlk|ps)\b/i); return m? m[1].toLowerCase() : null; }
 
 async function loadPlan(){
   const ws=monday();
@@ -564,7 +566,7 @@ async function loadPlan(){
   if(got.data && got.data.length) curPlan=got.data[0];
   else { const ins=await q(()=>sb.from('meal_plans').insert({week_start:ws,dinners:5}).select().single()); curPlan=ins.data; }
   if(!curPlan) return;
-  $('#weekLabel').textContent='week of '+fmtDate(ws);
+  $('#weekLabel').textContent='vko '+fmtDate(ws);
   $('#dinN').textContent=curPlan.dinners; $('#lunch').checked=!!curPlan.lunches; $('#planNote').value=curPlan.note||'';
   await loadRecipes(); await loadSlots();
 }
@@ -576,33 +578,35 @@ async function loadSlots(){
   const { data } = await q(()=>sb.from('meal_plan_slots').select('id,recipe_id,recipes(*)').eq('plan_id',curPlan.id).order('slot'));
   slots=data||[]; renderMenu(); renderRules();
 }
-function tagsOf(r){ const t=[]; if(r.is_vegetarian)t.push('veg'); if(r.has_fish)t.push('fish'); if(r.has_legume)t.push('legume'); if(r.has_tomato_sauce)t.push('tomato'); if(r.freezer_ok)t.push('freezer'); if(r.is_bread_centric)t.push('bread'); if(r.effort&&r.effort!=='normal')t.push(r.effort); return t; }
-function tagHtml(r){ const t=tagsOf(r); return t.length? t.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">no tags</span>'; }
+const EFFORT_FI={quick:'nopea',normal:'normaali',long:'pitkä'};
+const SEASON_FI={easter:'pääsiäinen',vappu:'vappu',midsummer:'juhannus',christmas:'joulu'};
+function tagsOf(r){ const t=[]; if(r.is_vegetarian)t.push('kasvis'); if(r.has_fish)t.push('kala'); if(r.has_legume)t.push('palko'); if(r.has_tomato_sauce)t.push('tomaatti'); if(r.freezer_ok)t.push('pakaste'); if(r.is_bread_centric)t.push('leipä'); if(r.batch>1)t.push(r.batch+'× erä'); if(r.effort&&r.effort!=='normal')t.push(EFFORT_FI[r.effort]||r.effort); if(r.season)t.push(SEASON_FI[r.season]||r.season); return t; }
+function tagHtml(r){ const t=tagsOf(r); return t.length? t.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">ei merkkejä</span>'; }
 function renderRecipes(){
   $('#recipeList').innerHTML = recipes.length? recipes.map(r=>`<li><div class="rowline">
     <div class="row-main"><div class="row-title">${esc(r.name)}</div><div class="row-sub" style="margin-top:5px">${tagHtml(r)}</div></div>
-    <button class="addbtn" data-week="${r.id}">+ week</button>
+    <button class="addbtn" data-week="${r.id}">+ viikko</button>
     <button class="xbtn" data-edit="${r.id}">✎</button></div></li>`).join('')
-    : '<li class="rowline muted" style="padding:16px 15px">No recipes yet — add your go-to meals with “+ New recipe”.</li>';
+    : '<li class="rowline muted" style="padding:16px 15px">Ei vielä reseptejä — lisää suosikkiruokasi “+ Uusi resepti” -painikkeella.</li>';
 }
 function renderMenu(){
-  $('#menuCount').textContent=slots.length+(curPlan?(' / '+curPlan.dinners+' dinners'):'');
+  $('#menuCount').textContent=slots.length+(curPlan?(' / '+curPlan.dinners+' illallista'):'');
   $('#menuList').innerHTML = slots.length? slots.map(s=>`<li><div class="rowline">
     <div class="row-main"><div class="row-title">${esc(s.recipes?.name||'?')}</div><div class="row-sub" style="margin-top:5px">${s.recipes?tagHtml(s.recipes):''}</div></div>
     <button class="xbtn" data-slot="${s.id}">×</button></div></li>`).join('')
-    : '<li class="rowline muted" style="padding:16px 15px">No meals picked. Add from your recipes below.</li>';
+    : '<li class="rowline muted" style="padding:16px 15px">Ei valittuja aterioita. Lisää alla olevista resepteistä.</li>';
 }
 function renderRules(){
   const rs=slots.map(s=>s.recipes).filter(Boolean); const n=rs.length;
-  if(!n){ $('#rulePanel').innerHTML='<span class="rchip">Pick meals to check house rules</span>'; return; }
+  if(!n){ $('#rulePanel').innerHTML='<span class="rchip">Valitse aterioita tarkistaaksesi säännöt</span>'; return; }
   const veg=rs.filter(r=>r.is_vegetarian).length;
   $('#rulePanel').innerHTML=[
-    rchip(veg/n>=0.5, `veg ${Math.round(veg/n*100)}%`),
-    rchip(rs.filter(r=>r.has_fish).length<=1,'fish ≤1'),
-    rchip(rs.filter(r=>r.has_tomato_sauce).length<=1,'tomato ≤1'),
-    rchip(rs.filter(r=>r.has_legume).length<=1,'legume ≤1'),
-    rchip(rs.filter(r=>r.freezer_ok).length>=1,'freezer ≥1'),
-    rchip(rs.filter(r=>r.is_bread_centric).length===0,'no bread'),
+    rchip(veg/n>=0.5, `kasvis ${Math.round(veg/n*100)}%`),
+    rchip(rs.filter(r=>r.has_fish).length<=1,'kala ≤1'),
+    rchip(rs.filter(r=>r.has_tomato_sauce).length<=1,'tomaatti ≤1'),
+    rchip(rs.filter(r=>r.has_legume).length<=1,'palkokasvi ≤1'),
+    rchip(rs.filter(r=>r.freezer_ok).length>=1,'pakastin ≥1'),
+    rchip(rs.filter(r=>r.is_bread_centric).length===0,'ei leipää'),
   ].join('');
 }
 function rchip(ok,label){ return `<span class="rchip ${ok?'ok':'no'}">${ok?'✓':'✕'} ${label}</span>`; }
@@ -615,7 +619,7 @@ let noteT; $('#planNote').addEventListener('input',e=>{ clearTimeout(noteT); con
 
 $('#recipeList').addEventListener('click',async e=>{
   const t=e.target.closest('[data-week],[data-edit]'); if(!t) return;
-  if(t.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+t.dataset.week})); toast('Added to menu'); loadSlots(); }
+  if(t.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+t.dataset.week})); toast('Lisätty ruokalistalle'); loadSlots(); }
   else openRecipeForm(recipes.find(r=>r.id==t.dataset.edit));
 });
 $('#menuList').addEventListener('click',async e=>{
@@ -627,38 +631,39 @@ $('#newRecipeBtn').addEventListener('click',()=>openRecipeForm(null));
 function tagCheck(id,label,on){ return `<label class="tagcheck"><input type="checkbox" id="${id}" ${on?'checked':''}>${label}</label>`; }
 function openRecipeForm(r){
   const e=r||{}, f=$('#recipeForm'); f.hidden=false;
-  f.innerHTML=`<input id="rfName" class="finput" placeholder="Recipe name" value="${esc(e.name||'')}">
-    <div class="tagrow">${tagCheck('rfVeg','vegetarian',e.is_vegetarian)}${tagCheck('rfFish','fish',e.has_fish)}${tagCheck('rfLeg','legume',e.has_legume)}${tagCheck('rfTom','tomato sauce',e.has_tomato_sauce)}${tagCheck('rfFreez','freezer-ok',e.freezer_ok)}${tagCheck('rfBread','bread-centric',e.is_bread_centric)}</div>
+  f.innerHTML=`<input id="rfName" class="finput" placeholder="Reseptin nimi" value="${esc(e.name||'')}">
+    <div class="tagrow">${tagCheck('rfVeg','kasvis',e.is_vegetarian)}${tagCheck('rfFish','kala',e.has_fish)}${tagCheck('rfLeg','palkokasvi',e.has_legume)}${tagCheck('rfTom','tomaattikastike',e.has_tomato_sauce)}${tagCheck('rfFreez','pakastuu',e.freezer_ok)}${tagCheck('rfBread','leipäpohjainen',e.is_bread_centric)}</div>
     <div class="tagrow">
-      <select id="rfEffort" class="finput" style="flex:1"><option value="quick">quick</option><option value="normal">normal</option><option value="long">long</option></select>
-      <select id="rfSeason" class="finput" style="flex:1"><option value="">any season</option><option value="easter">easter</option><option value="vappu">vappu</option><option value="midsummer">midsummer</option><option value="christmas">christmas</option></select>
+      <select id="rfEffort" class="finput" style="flex:1"><option value="quick">nopea</option><option value="normal">normaali</option><option value="long">pitkä</option></select>
+      <select id="rfSeason" class="finput" style="flex:1"><option value="">mikä tahansa sesonki</option><option value="easter">pääsiäinen</option><option value="vappu">vappu</option><option value="midsummer">juhannus</option><option value="christmas">joulu</option></select>
+      <select id="rfBatch" class="finput" style="flex:1"><option value="1">yksi erä</option><option value="2">tupla-erä (2×)</option><option value="3">tripla-erä (3×)</option><option value="4">4× erä</option></select>
     </div>
-    <textarea id="rfIng" class="finput" rows="5" placeholder="Ingredients, one per line — e.g.&#10;2 sipulia&#10;400 g härkäpapua&#10;2 dl riisiä"></textarea>
-    <div class="formbtns"><button class="btn" id="rfSave" style="flex:1">Save recipe</button><button class="signout" id="rfCancel">Cancel</button>${e.id?'<button class="signout" id="rfDelete" style="color:var(--danger)">Delete</button>':''}</div>`;
-  $('#rfEffort').value=e.effort||'normal'; $('#rfSeason').value=e.season||'';
+    <textarea id="rfIng" class="finput" rows="6" placeholder="Ainekset — määrä + aine per rivi, esim.&#10;2 sipulia&#10;400 g härkäpapua&#10;2 dl riisiä"></textarea>
+    <div class="formbtns"><button class="btn" id="rfSave" style="flex:1">Tallenna resepti</button><button class="signout" id="rfCancel">Peruuta</button>${e.id?'<button class="signout" id="rfDelete" style="color:var(--danger)">Poista</button>':''}</div>`;
+  $('#rfEffort').value=e.effort||'normal'; $('#rfSeason').value=e.season||''; $('#rfBatch').value=String(e.batch||1);
   if(e.id) loadIngredientsInto(e.id);
   $('#rfCancel').addEventListener('click',()=>{ f.hidden=true; f.innerHTML=''; });
   $('#rfSave').addEventListener('click',()=>saveRecipe(e.id||null));
-  if(e.id) $('#rfDelete').addEventListener('click',async()=>{ await q(()=>sb.from('recipes').delete().eq('id',e.id)); f.hidden=true; f.innerHTML=''; toast('Deleted'); loadRecipes(); loadSlots(); });
+  if(e.id) $('#rfDelete').addEventListener('click',async()=>{ await q(()=>sb.from('recipes').delete().eq('id',e.id)); f.hidden=true; f.innerHTML=''; toast('Poistettu'); loadRecipes(); loadSlots(); });
 }
 async function loadIngredientsInto(id){
   const { data } = await q(()=>sb.from('recipe_ingredients').select('line_text').eq('recipe_id',id).order('id'));
   $('#rfIng').value=(data||[]).map(x=>x.line_text).join('\n');
 }
 async function saveRecipe(id){
-  const name=$('#rfName').value.trim(); if(!name){ toast('Name required'); return; }
+  const name=$('#rfName').value.trim(); if(!name){ toast('Nimi vaaditaan'); return; }
   const rec={ name, is_vegetarian:$('#rfVeg').checked, has_fish:$('#rfFish').checked, has_legume:$('#rfLeg').checked,
     has_tomato_sauce:$('#rfTom').checked, freezer_ok:$('#rfFreez').checked, is_bread_centric:$('#rfBread').checked,
-    effort:$('#rfEffort').value, season:$('#rfSeason').value||null };
+    effort:$('#rfEffort').value, season:$('#rfSeason').value||null, batch:Number($('#rfBatch').value)||1 };
   let rid=id;
   if(id) await q(()=>sb.from('recipes').update(rec).eq('id',id));
   else { const ins=await q(()=>sb.from('recipes').insert(rec).select().single()); rid=ins.data&&ins.data.id; }
   if(rid){
     await q(()=>sb.from('recipe_ingredients').delete().eq('recipe_id',rid));
     const lines=$('#rfIng').value.split('\n').map(l=>l.trim()).filter(Boolean);
-    if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>({recipe_id:rid, line_text:l, ingredient_key:normKey(l), qty:parseQty(l)}))));
+    if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>({recipe_id:rid, line_text:l, ingredient_key:normKey(l), qty:parseQty(l), unit:parseUnit(l)}))));
   }
-  $('#recipeForm').hidden=true; $('#recipeForm').innerHTML=''; toast('Saved'); loadRecipes();
+  $('#recipeForm').hidden=true; $('#recipeForm').innerHTML=''; toast('Tallennettu'); loadRecipes();
 }
 
 boot();
