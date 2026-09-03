@@ -79,6 +79,9 @@
   .badge{font-family:var(--mono);font-size:.63rem;padding:3px 7px;border-radius:6px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
   .badge.due{background:var(--warn-soft);color:var(--warn)}
   .badge.changed{background:var(--accent-soft);color:var(--accent-ink)}
+  .badge.miss{background:var(--warn-soft);color:var(--warn)}
+  nav.tabs button.minor{flex:.72;color:var(--faint);font-size:.72rem}
+  nav.tabs button.primary{font-weight:600}
   .qty{font-family:var(--mono);font-weight:600;color:var(--accent-ink);min-width:30px;text-align:right}
   .bychip{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;font-family:var(--mono);font-size:.56rem;font-weight:600;color:#fff}
   .bychip.auto{width:auto;height:auto;border-radius:5px;padding:1px 6px;background:var(--surface-2);color:var(--faint);border:1px solid var(--line)}
@@ -164,21 +167,22 @@
   </div></header>
   <div class="wrap">
     <nav class="tabs" role="tablist">
-      <button role="tab" data-tab="dash" aria-selected="true">Home</button>
-      <button role="tab" data-tab="plan" aria-selected="false">Plan</button>
-      <button role="tab" data-tab="basket" aria-selected="false">Basket</button>
-      <button role="tab" data-tab="due" aria-selected="false">Due</button>
-      <button role="tab" data-tab="missing" aria-selected="false">Missing</button>
+      <button role="tab" data-tab="plan" aria-selected="true" class="primary">Plan</button>
+      <button role="tab" data-tab="basket" aria-selected="false" class="primary">Basket</button>
+      <button role="tab" data-tab="dash" aria-selected="false" class="minor">Orders</button>
+      <button role="tab" data-tab="due" aria-selected="false" class="minor">Due</button>
     </nav>
 
-    <section id="dash">
+    <section id="dash" hidden>
       <div class="stats" id="dashStats"></div>
       <h2>Recent orders <span class="sub">tap to expand</span></h2>
       <ul class="list" id="ordersList"><li class="rowline skeleton">Loading…</li></ul>
     </section>
 
     <section id="basket" hidden>
-      <h2>This week's basket <span class="sub" id="basketCount"></span></h2>
+      <div id="missWrap"></div>
+      <div id="menuWrap"></div>
+      <h2>Weekly basket <span class="sub" id="basketCount"></span></h2>
       <ul class="list" id="basketList"><li class="rowline skeleton">Loading…</li></ul>
       <div class="searchbar">
         <input id="addSearch" type="text" placeholder="Add an item to your basket…">
@@ -190,7 +194,7 @@
       <p class="hint">Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.</p>
     </section>
 
-    <section id="plan" hidden>
+    <section id="plan">
       <h2>This week <span class="sub" id="weekLabel"></span></h2>
       <div class="scope">
         <div class="scoperow"><span>Dinners to plan</span>
@@ -216,10 +220,6 @@
       <p class="hint">Staples bought in ≥25% of orders and now past their usual interval. Suggested quantity is your median.</p>
     </section>
 
-    <section id="missing" hidden>
-      <h2>Buy at pickup</h2>
-      <div id="missingWrap"><div class="skeleton">Loading…</div></div>
-    </section>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -273,12 +273,12 @@ $('#signout').addEventListener('click', ()=>sb.auth.signOut());
 
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
-  ['dash','plan','basket','due','missing'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
+  ['dash','plan','basket','due'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
 }));
 
 let ME='';
 let loaded=false;
-function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadPlan(); loadBasket(); loadDue(); loadMissing(); }
+function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadPlan(); loadBasket(); loadDue(); }
 function hue(s){ let h=0; for(const c of (s||'')) h=(h*31+c.charCodeAt(0))%360; return h; }
 function byChip(by){
   if(!by || by==='auto') return '<span class="bychip auto">auto</span>';
@@ -329,6 +329,9 @@ async function toggleOrder(li){
 
 // ---------- BASKET ----------
 let basket=[];   // [{product_id, default_qty, name, checked, due}]
+let missWeek=[]; // [{name, qty, checked}] — out-of-stock in the latest order
+let menuItems=[];// [{key, name, qty, product_id, checked, recipe}] resolved menu ingredients
+let unresolved=[];// [{key, name, qty, recipe}] menu ingredients with no product match yet
 async function loadBasket(){
   const { data, error } = await q(()=>sb.from('standard_basket')
     .select('product_id,default_qty,added_by,products(name)'));
@@ -344,6 +347,8 @@ async function loadBasket(){
     .sort((a,b)=>a.name.localeCompare(b.name));
   renderBasket();
   loadSuggestions(ids);
+  loadMissingSection();
+  loadMenuSection();
 }
 function renderBasket(){
   $('#basketCount').textContent = basket.length+' items';
@@ -406,7 +411,11 @@ $('#addSearch').addEventListener('input', e=>{
 });
 
 $('#copyBtn').addEventListener('click',()=>{
-  const lines=basket.filter(b=>b.checked).map(b=>`${trimQty(b.default_qty)} × ${cap(b.name)}`);
+  const lines=[
+    ...missWeek.filter(m=>m.checked).map(m=>`${trimQty(m.qty)} × ${cap(m.name)}`),
+    ...menuItems.filter(m=>m.checked).map(m=>`${m.qty?trimQty(m.qty)+' × ':''}${cap(m.name)}`),
+    ...basket.filter(b=>b.checked).map(b=>`${trimQty(b.default_qty)} × ${cap(b.name)}`),
+  ];
   if(!lines.length){ toast('Nothing checked'); return; }
   const text=lines.join('\n');
   navigator.clipboard.writeText(text).then(()=>toast(lines.length+' items copied'))
@@ -428,18 +437,114 @@ async function loadDue(){
     </div></li>`).join('');
 }
 
-// ---------- MISSING ----------
-async function loadMissing(){
+// ---------- MISSING (top of basket) ----------
+const CHK='<svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+let missLatest='';
+async function loadMissingSection(){
   const { data, error } = await q(()=>sb.from('missing_items')
     .select('product_name_raw,qty,order_id,orders(order_date)').order('noted_at',{ascending:false}).limit(200));
-  if(error) return fail('#missingWrap',error);
-  if(!data.length){ $('#missingWrap').innerHTML='<div class="empty"><span class="big">🎉</span>No missing items on record.</div>'; return; }
-  const latest=data.reduce((m,r)=>(r.orders?.order_date>m? r.orders.order_date : m),'0000');
-  const items=data.filter(r=>r.orders?.order_date===latest);
-  $('#missingWrap').innerHTML=`<p class="hint" style="margin:0 2px 12px">Out of stock in your latest order — ${fmtDate(latest)}. Grab these in store.</p>`+
-    `<ul class="list">`+items.map(m=>`<li><div class="rowline">
-      <div class="row-main"><div class="row-title">${cap(m.product_name_raw)}</div></div>
+  if(error || !data || !data.length){ missWeek=[]; $('#missWrap').innerHTML=''; return; }
+  missLatest=data.reduce((m,r)=>(r.orders?.order_date>m? r.orders.order_date : m),'0000');
+  const items=data.filter(r=>r.orders?.order_date===missLatest);
+  missWeek=items.map(m=>({name:m.product_name_raw, qty:Number(m.qty)||1, checked:true}));
+  renderMissingSection();
+}
+function renderMissingSection(){
+  const w=$('#missWrap'); if(!w) return;
+  if(!missWeek.length){ w.innerHTML=''; return; }
+  w.innerHTML=`<h2 style="margin-top:4px">Missing from last order <span class="badge miss">${missWeek.length}</span></h2>
+    <p class="hint" style="margin:0 2px 10px">Out of stock ${fmtDate(missLatest)} — re-add here or grab in store.</p>
+    <ul class="list">`+missWeek.map((m,i)=>`<li><div class="rowline">
+      <div class="cbx ${m.checked?'on':''}" data-mchk="${i}">${CHK}</div>
+      <div class="row-main"><div class="row-title">${cap(m.name)}</div></div>
+      <span class="badge miss" style="padding:1px 6px">missing</span>
       <div class="qty">×${trimQty(m.qty)}</div></div></li>`).join('')+`</ul>`;
+}
+$('#missWrap').addEventListener('click',e=>{
+  const t=e.target.closest('[data-mchk]'); if(!t) return;
+  const i=+t.dataset.mchk; missWeek[i].checked=!missWeek[i].checked; renderMissingSection();
+});
+
+// ---------- MENU → basket (Phase 3) ----------
+async function loadMenuSection(){
+  const ws=monday();
+  const mp=await q(()=>sb.from('meal_plans').select('id').eq('week_start',ws).limit(1));
+  const planId=mp.data && mp.data[0] && mp.data[0].id;
+  if(!planId){ menuItems=[]; unresolved=[]; $('#menuWrap').innerHTML=''; return; }
+  const sl=await q(()=>sb.from('meal_plan_slots').select('recipe_id,recipes(name)').eq('plan_id',planId));
+  const rows=sl.data||[];
+  if(!rows.length){ menuItems=[]; unresolved=[]; $('#menuWrap').innerHTML=''; return; }
+  const rids=[...new Set(rows.map(r=>r.recipe_id))];
+  const nameById={}; rows.forEach(r=>{ if(r.recipes) nameById[r.recipe_id]=r.recipes.name; });
+  const ing=await q(()=>sb.from('recipe_ingredients')
+    .select('recipe_id,line_text,ingredient_key,qty,product_id,is_pantry,products(name)').in('recipe_id',rids));
+  const list=(ing.data||[]).filter(x=>!x.is_pantry);
+  const needKeys=[...new Set(list.filter(x=>!x.product_id && x.ingredient_key).map(x=>x.ingredient_key))];
+  const mapByKey={};
+  if(needKeys.length){
+    const m2=await q(()=>sb.from('ingredient_product_map').select('ingredient_key,product_id,products(name)').in('ingredient_key',needKeys));
+    (m2.data||[]).forEach(m=>mapByKey[m.ingredient_key]={product_id:m.product_id, name:m.products?.name});
+  }
+  const byPid={}, unByKey={};
+  list.forEach(x=>{
+    const recipe=nameById[x.recipe_id]||'';
+    let pid=x.product_id, nm=x.products?.name;
+    if(!pid && x.ingredient_key && mapByKey[x.ingredient_key]){ pid=mapByKey[x.ingredient_key].product_id; nm=mapByKey[x.ingredient_key].name; }
+    if(pid){
+      if(byPid[pid]){ const e=byPid[pid]; e.qty=null; if(recipe && !e.recipe.includes(recipe)) e.recipe+=', '+recipe; }
+      else byPid[pid]={key:x.ingredient_key, name:nm||x.line_text, qty:x.qty, product_id:pid, checked:true, recipe};
+    } else {
+      const k=x.ingredient_key||normKey(x.line_text);
+      if(!unByKey[k]) unByKey[k]={key:k, name:x.line_text, qty:x.qty, recipe};
+      else if(recipe && !unByKey[k].recipe.includes(recipe)) unByKey[k].recipe+=', '+recipe;
+    }
+  });
+  menuItems=Object.values(byPid); unresolved=Object.values(unByKey);
+  renderMenuSection();
+}
+function renderMenuSection(){
+  const w=$('#menuWrap'); if(!w) return;
+  if(!menuItems.length && !unresolved.length){ w.innerHTML=''; return; }
+  let html=`<h2 style="margin-top:4px">From this week's menu <span class="sub">${menuItems.length+unresolved.length}</span></h2>`;
+  if(menuItems.length){
+    html+=`<ul class="list">`+menuItems.map((m,i)=>`<li><div class="rowline">
+      <div class="cbx ${m.checked?'on':''}" data-nchk="${i}">${CHK}</div>
+      <div class="row-main"><div class="row-title">${cap(m.name)}</div>
+        ${m.recipe?`<div class="row-sub" style="margin-top:4px"><span class="muted" style="font-size:.72rem">${esc(m.recipe)}</span></div>`:''}</div>
+      ${m.qty?`<div class="qty">×${trimQty(m.qty)}</div>`:''}</div></li>`).join('')+`</ul>`;
+  }
+  if(unresolved.length){
+    html+=`<p class="hint" style="margin:12px 2px 8px">Match a product once and ruokassi remembers it:</p>`+
+    `<ul class="list">`+unresolved.map((u,i)=>`<li><div style="padding:10px 15px">
+      <div class="row-title">${esc(u.name)}${u.recipe?` <span class="muted" style="font-size:.72rem">· ${esc(u.recipe)}</span>`:''}</div>
+      <input class="finput nres" data-key="${esc(u.key)}" placeholder="match a product…" style="margin-top:6px">
+      <ul class="list nres-res"></ul></div></li>`).join('')+`</ul>`;
+  }
+  w.innerHTML=html;
+}
+$('#menuWrap').addEventListener('click',e=>{
+  const chk=e.target.closest('[data-nchk]');
+  if(chk){ const i=+chk.dataset.nchk; menuItems[i].checked=!menuItems[i].checked; renderMenuSection(); return; }
+  const pick=e.target.closest('[data-pick]');
+  if(pick){ resolveKey(pick.dataset.key, +pick.dataset.pick); }
+});
+let nresT;
+$('#menuWrap').addEventListener('input',e=>{
+  const inp=e.target.closest('.nres'); if(!inp) return;
+  clearTimeout(nresT); const term=inp.value.trim(); const key=inp.dataset.key;
+  const resUl=inp.parentElement.querySelector('.nres-res');
+  if(term.length<2){ resUl.innerHTML=''; return; }
+  nresT=setTimeout(async()=>{
+    const { data } = await q(()=>sb.from('products').select('id,name').ilike('name','%'+term+'%').order('name').limit(8));
+    resUl.innerHTML=(data||[]).map(p=>`<li><div class="rowline">
+      <div class="row-main"><div class="row-title">${cap(p.name)}</div></div>
+      <button class="addbtn" data-pick="${p.id}" data-key="${esc(key)}">use</button></div></li>`).join('');
+  },250);
+});
+async function resolveKey(key, pid){
+  await q(()=>sb.from('ingredient_product_map').upsert({ingredient_key:key, product_id:pid, last_used_at:new Date().toISOString()},{onConflict:'ingredient_key'}));
+  await q(()=>sb.from('recipe_ingredients').update({product_id:pid}).eq('ingredient_key',key).is('product_id',null));
+  toast('Matched — remembered'); loadMenuSection();
 }
 
 // helpers
