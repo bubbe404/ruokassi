@@ -84,6 +84,24 @@
   .bychip.auto{width:auto;height:auto;border-radius:5px;padding:1px 6px;background:var(--surface-2);color:var(--faint);border:1px solid var(--line)}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;color:var(--faint);margin:12px 2px 0;align-items:center}
   .legend span{display:inline-flex;gap:5px;align-items:center}
+  nav.tabs button{font-size:.77rem;padding:9px 1px}
+  .scope{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:2px 15px;margin-bottom:10px}
+  .scoperow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+  .scoperow:first-child{border-top:0}
+  .scoperow input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+  .noteinput{width:100%;margin:0 0 12px;padding:11px 13px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--ink);font-size:.92rem;font-family:inherit}
+  .rulepanel{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 4px}
+  .rchip{font-family:var(--mono);font-size:.68rem;padding:5px 9px;border-radius:7px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+  .rchip.ok{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+  .rchip.no{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+  .tg{font-family:var(--mono);font-size:.6rem;background:var(--surface-2);color:var(--muted);padding:1px 6px;border-radius:5px;border:1px solid var(--line)}
+  .finput{width:100%;margin:6px 0;padding:10px 12px;border:1px solid var(--line-strong);border-radius:9px;background:var(--surface);color:var(--ink);font-size:.92rem;font-family:inherit}
+  textarea.finput{resize:vertical}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+  .tagcheck{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);border:1px solid var(--line-strong);border-radius:8px;padding:7px 11px;cursor:pointer}
+  .tagcheck input{accent-color:var(--accent)}
+  .formbtns{display:flex;gap:8px;align-items:center;margin-top:8px}
+  #recipeForm{background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:14px 15px;margin:10px 0}
 
   /* basket */
   .cbx{width:22px;height:22px;flex:none;border:1.5px solid var(--line-strong);border-radius:6px;display:grid;place-items:center;color:#fff;background:var(--surface)}
@@ -146,7 +164,8 @@
   </div></header>
   <div class="wrap">
     <nav class="tabs" role="tablist">
-      <button role="tab" data-tab="dash" aria-selected="true">Overview</button>
+      <button role="tab" data-tab="dash" aria-selected="true">Home</button>
+      <button role="tab" data-tab="plan" aria-selected="false">Plan</button>
       <button role="tab" data-tab="basket" aria-selected="false">Basket</button>
       <button role="tab" data-tab="due" aria-selected="false">Due</button>
       <button role="tab" data-tab="missing" aria-selected="false">Missing</button>
@@ -169,6 +188,26 @@
       <div class="copybar"><button class="copybtn" id="copyBtn">Copy checked items</button></div>
       <div class="legend"><span><span class="bychip auto">auto</span> from your history</span><span><span class="bychip" style="background:hsl(210 45% 42%)">M</span> who added it</span></div>
       <p class="hint">Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.</p>
+    </section>
+
+    <section id="plan" hidden>
+      <h2>This week <span class="sub" id="weekLabel"></span></h2>
+      <div class="scope">
+        <div class="scoperow"><span>Dinners to plan</span>
+          <div class="stepper"><button id="dinDec">–</button><span class="qv" id="dinN">5</span><button id="dinInc">+</button></div></div>
+        <label class="scoperow"><span>Include lunches</span><input type="checkbox" id="lunch"></label>
+      </div>
+      <input id="planNote" class="noteinput" placeholder="This week: guests, away, eating out…">
+      <div class="rulepanel" id="rulePanel"></div>
+
+      <h2 style="margin-top:20px">Menu <span class="sub" id="menuCount"></span></h2>
+      <ul class="list" id="menuList"></ul>
+
+      <h2 style="margin-top:24px">Recipes <span class="sub" id="recCount"></span></h2>
+      <button class="addbtn" id="newRecipeBtn">+ New recipe</button>
+      <div id="recipeForm" hidden></div>
+      <ul class="list" id="recipeList" style="margin-top:10px"></ul>
+      <p class="hint">Your family's go-to meals. Pick this week's dinners into the menu — the chips above check your house rules live. Ingredients flowing into the Basket comes in the next update.</p>
     </section>
 
     <section id="due" hidden>
@@ -234,12 +273,12 @@ $('#signout').addEventListener('click', ()=>sb.auth.signOut());
 
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
-  ['dash','basket','due','missing'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
+  ['dash','plan','basket','due','missing'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
 }));
 
 let ME='';
 let loaded=false;
-function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadBasket(); loadDue(); loadMissing(); }
+function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadPlan(); loadBasket(); loadDue(); loadMissing(); }
 function hue(s){ let h=0; for(const c of (s||'')) h=(h*31+c.charCodeAt(0))%360; return h; }
 function byChip(by){
   if(!by || by==='auto') return '<span class="bychip auto">auto</span>';
@@ -406,6 +445,116 @@ async function loadMissing(){
 // helpers
 function tile(n,k){ return `<div class="tile"><div class="n">${n}</div><div class="k">${k}</div></div>`; }
 function fail(sel,err){ const el=$(sel); if(el) el.innerHTML=`<li class="empty" style="color:var(--danger)">${err.message||'Could not load'}</li>`; }
+
+// ---------- PLAN ----------
+let curPlan=null, recipes=[], slots=[];
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+function monday(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
+function normKey(l){ return (l||'').toLowerCase().replace(/^[\s\d.,/-]+/,'').replace(/^(g|kg|dl|l|ml|kpl|tl|rkl|prk|ps|pkt|ras|pkl)\b\.?\s*/,'').trim().split(/\s+/).slice(0,2).join(' '); }
+function parseQty(l){ const m=(l||'').match(/^\s*([\d.,]+)/); return m? Number(m[1].replace(',','.')) : null; }
+
+async function loadPlan(){
+  const ws=monday();
+  const got=await q(()=>sb.from('meal_plans').select('*').eq('week_start',ws).limit(1));
+  if(got.data && got.data.length) curPlan=got.data[0];
+  else { const ins=await q(()=>sb.from('meal_plans').insert({week_start:ws,dinners:5}).select().single()); curPlan=ins.data; }
+  if(!curPlan) return;
+  $('#weekLabel').textContent='week of '+fmtDate(ws);
+  $('#dinN').textContent=curPlan.dinners; $('#lunch').checked=!!curPlan.lunches; $('#planNote').value=curPlan.note||'';
+  await loadRecipes(); await loadSlots();
+}
+async function loadRecipes(){
+  const { data } = await q(()=>sb.from('recipes').select('*').order('name'));
+  recipes=data||[]; $('#recCount').textContent=recipes.length; renderRecipes();
+}
+async function loadSlots(){
+  const { data } = await q(()=>sb.from('meal_plan_slots').select('id,recipe_id,recipes(*)').eq('plan_id',curPlan.id).order('slot'));
+  slots=data||[]; renderMenu(); renderRules();
+}
+function tagsOf(r){ const t=[]; if(r.is_vegetarian)t.push('veg'); if(r.has_fish)t.push('fish'); if(r.has_legume)t.push('legume'); if(r.has_tomato_sauce)t.push('tomato'); if(r.freezer_ok)t.push('freezer'); if(r.is_bread_centric)t.push('bread'); if(r.effort&&r.effort!=='normal')t.push(r.effort); return t; }
+function tagHtml(r){ const t=tagsOf(r); return t.length? t.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">no tags</span>'; }
+function renderRecipes(){
+  $('#recipeList').innerHTML = recipes.length? recipes.map(r=>`<li><div class="rowline">
+    <div class="row-main"><div class="row-title">${esc(r.name)}</div><div class="row-sub" style="margin-top:5px">${tagHtml(r)}</div></div>
+    <button class="addbtn" data-week="${r.id}">+ week</button>
+    <button class="xbtn" data-edit="${r.id}">✎</button></div></li>`).join('')
+    : '<li class="rowline muted" style="padding:16px 15px">No recipes yet — add your go-to meals with “+ New recipe”.</li>';
+}
+function renderMenu(){
+  $('#menuCount').textContent=slots.length+(curPlan?(' / '+curPlan.dinners+' dinners'):'');
+  $('#menuList').innerHTML = slots.length? slots.map(s=>`<li><div class="rowline">
+    <div class="row-main"><div class="row-title">${esc(s.recipes?.name||'?')}</div><div class="row-sub" style="margin-top:5px">${s.recipes?tagHtml(s.recipes):''}</div></div>
+    <button class="xbtn" data-slot="${s.id}">×</button></div></li>`).join('')
+    : '<li class="rowline muted" style="padding:16px 15px">No meals picked. Add from your recipes below.</li>';
+}
+function renderRules(){
+  const rs=slots.map(s=>s.recipes).filter(Boolean); const n=rs.length;
+  if(!n){ $('#rulePanel').innerHTML='<span class="rchip">Pick meals to check house rules</span>'; return; }
+  const veg=rs.filter(r=>r.is_vegetarian).length;
+  $('#rulePanel').innerHTML=[
+    rchip(veg/n>=0.5, `veg ${Math.round(veg/n*100)}%`),
+    rchip(rs.filter(r=>r.has_fish).length<=1,'fish ≤1'),
+    rchip(rs.filter(r=>r.has_tomato_sauce).length<=1,'tomato ≤1'),
+    rchip(rs.filter(r=>r.has_legume).length<=1,'legume ≤1'),
+    rchip(rs.filter(r=>r.freezer_ok).length>=1,'freezer ≥1'),
+    rchip(rs.filter(r=>r.is_bread_centric).length===0,'no bread'),
+  ].join('');
+}
+function rchip(ok,label){ return `<span class="rchip ${ok?'ok':'no'}">${ok?'✓':'✕'} ${label}</span>`; }
+
+$('#dinInc').addEventListener('click',()=>setDinners(curPlan.dinners+1));
+$('#dinDec').addEventListener('click',()=>setDinners(Math.max(1,curPlan.dinners-1)));
+async function setDinners(v){ curPlan.dinners=v; $('#dinN').textContent=v; renderMenu(); await q(()=>sb.from('meal_plans').update({dinners:v}).eq('id',curPlan.id)); }
+$('#lunch').addEventListener('change',async e=>{ curPlan.lunches=e.target.checked; await q(()=>sb.from('meal_plans').update({lunches:e.target.checked}).eq('id',curPlan.id)); });
+let noteT; $('#planNote').addEventListener('input',e=>{ clearTimeout(noteT); const v=e.target.value; noteT=setTimeout(()=>q(()=>sb.from('meal_plans').update({note:v}).eq('id',curPlan.id)),700); });
+
+$('#recipeList').addEventListener('click',async e=>{
+  const t=e.target.closest('[data-week],[data-edit]'); if(!t) return;
+  if(t.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+t.dataset.week})); toast('Added to menu'); loadSlots(); }
+  else openRecipeForm(recipes.find(r=>r.id==t.dataset.edit));
+});
+$('#menuList').addEventListener('click',async e=>{
+  const t=e.target.closest('[data-slot]'); if(!t) return;
+  await q(()=>sb.from('meal_plan_slots').delete().eq('id',+t.dataset.slot)); loadSlots();
+});
+
+$('#newRecipeBtn').addEventListener('click',()=>openRecipeForm(null));
+function tagCheck(id,label,on){ return `<label class="tagcheck"><input type="checkbox" id="${id}" ${on?'checked':''}>${label}</label>`; }
+function openRecipeForm(r){
+  const e=r||{}, f=$('#recipeForm'); f.hidden=false;
+  f.innerHTML=`<input id="rfName" class="finput" placeholder="Recipe name" value="${esc(e.name||'')}">
+    <div class="tagrow">${tagCheck('rfVeg','vegetarian',e.is_vegetarian)}${tagCheck('rfFish','fish',e.has_fish)}${tagCheck('rfLeg','legume',e.has_legume)}${tagCheck('rfTom','tomato sauce',e.has_tomato_sauce)}${tagCheck('rfFreez','freezer-ok',e.freezer_ok)}${tagCheck('rfBread','bread-centric',e.is_bread_centric)}</div>
+    <div class="tagrow">
+      <select id="rfEffort" class="finput" style="flex:1"><option value="quick">quick</option><option value="normal">normal</option><option value="long">long</option></select>
+      <select id="rfSeason" class="finput" style="flex:1"><option value="">any season</option><option value="easter">easter</option><option value="vappu">vappu</option><option value="midsummer">midsummer</option><option value="christmas">christmas</option></select>
+    </div>
+    <textarea id="rfIng" class="finput" rows="5" placeholder="Ingredients, one per line — e.g.&#10;2 sipulia&#10;400 g härkäpapua&#10;2 dl riisiä"></textarea>
+    <div class="formbtns"><button class="btn" id="rfSave" style="flex:1">Save recipe</button><button class="signout" id="rfCancel">Cancel</button>${e.id?'<button class="signout" id="rfDelete" style="color:var(--danger)">Delete</button>':''}</div>`;
+  $('#rfEffort').value=e.effort||'normal'; $('#rfSeason').value=e.season||'';
+  if(e.id) loadIngredientsInto(e.id);
+  $('#rfCancel').addEventListener('click',()=>{ f.hidden=true; f.innerHTML=''; });
+  $('#rfSave').addEventListener('click',()=>saveRecipe(e.id||null));
+  if(e.id) $('#rfDelete').addEventListener('click',async()=>{ await q(()=>sb.from('recipes').delete().eq('id',e.id)); f.hidden=true; f.innerHTML=''; toast('Deleted'); loadRecipes(); loadSlots(); });
+}
+async function loadIngredientsInto(id){
+  const { data } = await q(()=>sb.from('recipe_ingredients').select('line_text').eq('recipe_id',id).order('id'));
+  $('#rfIng').value=(data||[]).map(x=>x.line_text).join('\n');
+}
+async function saveRecipe(id){
+  const name=$('#rfName').value.trim(); if(!name){ toast('Name required'); return; }
+  const rec={ name, is_vegetarian:$('#rfVeg').checked, has_fish:$('#rfFish').checked, has_legume:$('#rfLeg').checked,
+    has_tomato_sauce:$('#rfTom').checked, freezer_ok:$('#rfFreez').checked, is_bread_centric:$('#rfBread').checked,
+    effort:$('#rfEffort').value, season:$('#rfSeason').value||null };
+  let rid=id;
+  if(id) await q(()=>sb.from('recipes').update(rec).eq('id',id));
+  else { const ins=await q(()=>sb.from('recipes').insert(rec).select().single()); rid=ins.data&&ins.data.id; }
+  if(rid){
+    await q(()=>sb.from('recipe_ingredients').delete().eq('recipe_id',rid));
+    const lines=$('#rfIng').value.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>({recipe_id:rid, line_text:l, ingredient_key:normKey(l), qty:parseQty(l)}))));
+  }
+  $('#recipeForm').hidden=true; $('#recipeForm').innerHTML=''; toast('Saved'); loadRecipes();
+}
 
 boot();
 </script>
