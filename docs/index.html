@@ -32,76 +32,99 @@
   }}
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{
-    background:var(--bg);color:var(--ink);font-family:var(--sans);
-    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
-    padding-bottom:env(safe-area-inset-bottom);
-  }
-  .wrap{max-width:560px;margin:0 auto;padding:0 16px 40px}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:560px;margin:0 auto;padding:0 16px 48px}
   button{font-family:inherit;cursor:pointer}
+  input{font-family:inherit}
 
-  /* header */
   header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);
     backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .bar{max-width:560px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
   .brand{font-family:var(--display);font-weight:600;font-size:1.35rem;letter-spacing:-.02em;color:var(--ink);display:flex;align-items:center;gap:8px}
   .brand .dot{width:11px;height:11px;border-radius:3px;background:var(--accent)}
-  .signout{background:none;border:1px solid var(--line-strong);color:var(--muted);
-    border-radius:8px;padding:6px 11px;font-size:.8rem;font-family:var(--mono)}
+  .signout{background:none;border:1px solid var(--line-strong);color:var(--muted);border-radius:8px;padding:6px 11px;font-size:.8rem;font-family:var(--mono)}
 
-  /* tabs */
-  nav.tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);
-    border-radius:11px;padding:4px;margin:16px 0 18px}
-  nav.tabs button{flex:1;border:0;background:none;color:var(--muted);font-weight:500;
-    font-size:.86rem;padding:9px 4px;border-radius:8px;transition:all .12s}
+  nav.tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:4px;margin:16px 0 18px}
+  nav.tabs button{flex:1;border:0;background:none;color:var(--muted);font-weight:500;font-size:.82rem;padding:9px 2px;border-radius:8px;transition:all .12s}
   nav.tabs button[aria-selected="true"]{background:var(--surface);color:var(--accent-ink);box-shadow:var(--shadow)}
 
   section[hidden]{display:none}
-  h2{font-family:var(--display);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;margin:4px 2px 12px}
+  h2{font-family:var(--display);font-weight:600;font-size:1.15rem;letter-spacing:-.01em;margin:4px 2px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  h2 .sub{font-family:var(--mono);font-size:.7rem;font-weight:400;color:var(--faint)}
 
-  /* stat tiles */
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
   .tile{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:13px 12px;box-shadow:var(--shadow)}
   .tile .n{font-family:var(--display);font-weight:600;font-size:1.28rem;line-height:1;letter-spacing:-.02em;color:var(--accent-ink);font-variant-numeric:tabular-nums}
   .tile .k{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);margin-top:8px}
 
-  /* list rows */
   ul.list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
-  ul.list li{display:flex;align-items:center;gap:12px;padding:13px 15px;border-top:1px solid var(--line)}
-  ul.list li:first-child{border-top:0}
+  ul.list>li{border-top:1px solid var(--line)}
+  ul.list>li:first-child{border-top:0}
+  .rowline{display:flex;align-items:center;gap:12px;padding:13px 15px}
+  .rowline.tap{cursor:pointer}
   .row-main{flex:1;min-width:0}
   .row-title{font-weight:500;font-size:.94rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row-sub{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin-top:3px}
   .row-val{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .badge{font-family:var(--mono);font-size:.64rem;padding:3px 7px;border-radius:6px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+  .chev{color:var(--faint);font-size:.8rem;transition:transform .15s;flex:none}
+  li.open .chev{transform:rotate(90deg)}
+  .items{display:none;padding:2px 15px 12px 15px;background:var(--surface-2)}
+  li.open .items{display:block}
+  .items .it{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.82rem;border-top:1px dashed var(--line)}
+  .items .it:first-child{border-top:0}
+  .items .it .nm{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .items .it .vl{font-family:var(--mono);color:var(--faint);white-space:nowrap}
+
+  .badge{font-family:var(--mono);font-size:.63rem;padding:3px 7px;border-radius:6px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
   .badge.due{background:var(--warn-soft);color:var(--warn)}
   .badge.changed{background:var(--accent-soft);color:var(--accent-ink)}
-  .qty{font-family:var(--mono);font-weight:600;color:var(--accent-ink);min-width:34px;text-align:right}
+  .qty{font-family:var(--mono);font-weight:600;color:var(--accent-ink);min-width:30px;text-align:right}
+
+  /* basket */
+  .cbx{width:22px;height:22px;flex:none;border:1.5px solid var(--line-strong);border-radius:6px;display:grid;place-items:center;color:#fff;background:var(--surface)}
+  .cbx.on{background:var(--accent);border-color:var(--accent)}
+  .cbx svg{width:13px;height:13px;opacity:0}
+  .cbx.on svg{opacity:1}
+  .stepper{display:flex;align-items:center;gap:0;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+  .stepper button{width:30px;height:30px;border:0;background:var(--surface-2);color:var(--accent-ink);font-size:1.1rem;line-height:1}
+  .stepper .qv{min-width:34px;text-align:center;font-family:var(--mono);font-size:.85rem;font-variant-numeric:tabular-nums}
+  .xbtn{border:0;background:none;color:var(--faint);font-size:1.1rem;width:28px;height:28px;border-radius:6px;flex:none}
+  .xbtn:hover{color:var(--danger)}
+  .addbtn{border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-ink);border-radius:8px;padding:6px 12px;font-size:.8rem;font-weight:600;font-family:var(--mono);flex:none}
+  .copybar{position:sticky;bottom:0;padding:12px 0 4px;background:linear-gradient(transparent,var(--bg) 30%)}
+  .copybtn{width:100%;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px;font-size:1rem;font-weight:600}
+  .searchbar{display:flex;gap:8px;margin:14px 0 8px}
+  .searchbar input{flex:1;padding:11px 13px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--ink);font-size:.95rem}
+  .searchbar input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+  .results{list-style:none;margin:6px 0 0;padding:0}
+  .results li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--line);border-top:0;background:var(--surface)}
+  .results li:first-child{border-top:1px solid var(--line);border-radius:10px 10px 0 0}
+  .results li:last-child{border-radius:0 0 10px 10px}
 
   .muted{color:var(--muted)}
   .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:.92rem}
   .empty .big{font-size:1.6rem;display:block;margin-bottom:8px}
   .hint{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin:10px 2px 0}
+  .skeleton{color:var(--faint);text-align:center;padding:30px;font-family:var(--mono);font-size:.8rem}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);
+    padding:11px 18px;border-radius:10px;font-size:.85rem;opacity:0;transition:all .2s;pointer-events:none;z-index:20}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* login */
   .login{max-width:400px;margin:14vh auto 0;padding:0 22px;text-align:center}
   .login .brand{justify-content:center;font-size:2rem;margin-bottom:6px}
   .login p{color:var(--muted);margin:0 0 26px}
   .login form{display:flex;flex-direction:column;gap:10px}
-  .login input{font-family:inherit;font-size:1rem;padding:13px 15px;border:1px solid var(--line-strong);
-    border-radius:11px;background:var(--surface);color:var(--ink)}
+  .login input{font-size:1rem;padding:13px 15px;border:1px solid var(--line-strong);border-radius:11px;background:var(--surface);color:var(--ink)}
   .login input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
   .btn{background:var(--accent);color:#fff;border:0;border-radius:11px;padding:13px;font-size:1rem;font-weight:600}
   .btn:disabled{opacity:.55}
   .msg{margin-top:16px;font-size:.9rem;color:var(--accent-ink);min-height:1.2em}
   .msg.err{color:var(--danger)}
-
-  .skeleton{color:var(--faint);text-align:center;padding:30px;font-family:var(--mono);font-size:.8rem}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login" class="login" hidden>
   <div class="brand"><span class="dot"></span>ruokassi</div>
   <p>Weekly food, at a glance.</p>
@@ -112,30 +135,40 @@
   <div class="msg" id="loginMsg"></div>
 </div>
 
-<!-- APP -->
 <div id="app" hidden>
-  <header>
-    <div class="bar">
-      <div class="brand"><span class="dot"></span>ruokassi</div>
-      <button class="signout" id="signout">Sign out</button>
-    </div>
-  </header>
+  <header><div class="bar">
+    <div class="brand"><span class="dot"></span>ruokassi</div>
+    <button class="signout" id="signout">Sign out</button>
+  </div></header>
   <div class="wrap">
     <nav class="tabs" role="tablist">
       <button role="tab" data-tab="dash" aria-selected="true">Overview</button>
+      <button role="tab" data-tab="basket" aria-selected="false">Basket</button>
       <button role="tab" data-tab="due" aria-selected="false">Due</button>
       <button role="tab" data-tab="missing" aria-selected="false">Missing</button>
     </nav>
 
     <section id="dash">
       <div class="stats" id="dashStats"></div>
-      <h2>Recent orders</h2>
-      <ul class="list" id="ordersList"><li class="skeleton">Loading…</li></ul>
+      <h2>Recent orders <span class="sub">tap to expand</span></h2>
+      <ul class="list" id="ordersList"><li class="rowline skeleton">Loading…</li></ul>
+    </section>
+
+    <section id="basket" hidden>
+      <h2>This week's basket <span class="sub" id="basketCount"></span></h2>
+      <ul class="list" id="basketList"><li class="rowline skeleton">Loading…</li></ul>
+      <div class="searchbar">
+        <input id="addSearch" type="text" placeholder="Add an item to your basket…">
+      </div>
+      <ul class="results" id="addResults"></ul>
+      <div id="sugWrap"></div>
+      <div class="copybar"><button class="copybtn" id="copyBtn">Copy checked items</button></div>
+      <p class="hint">Your standing weekly basket. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week.</p>
     </section>
 
     <section id="due" hidden>
       <h2>Due to reorder</h2>
-      <ul class="list" id="dueList"><li class="skeleton">Loading…</li></ul>
+      <ul class="list" id="dueList"><li class="rowline skeleton">Loading…</li></ul>
       <p class="hint">Staples bought in ≥25% of orders and now past their usual interval. Suggested quantity is your median.</p>
     </section>
 
@@ -145,114 +178,222 @@
     </section>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 const SB_URL = 'https://nzpkmtwmdruqcsussxgr.supabase.co';
-const SB_KEY = 'sb_publishable_E4upj6yh9azSKDx_JP2R4A_bCXyqF-A';
+// classic anon key (widely compatible); RLS gates all access.
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGttdHdtZHJ1cWNzdXNzeGdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNTc3NTgsImV4cCI6MjEwMzkzMzc1OH0.wxvqTxwPOIYpkftS6qT6VjKn2-2ot0fjKgCEkpV_Rfs';
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
-const eur = new Intl.NumberFormat('fi-FI', {style:'currency', currency:'EUR'});
+const eur = new Intl.NumberFormat('fi-FI',{style:'currency',currency:'EUR'});
 const fmtDate = iso => iso ? new Date(iso+'T00:00:00').toLocaleDateString('fi-FI',{day:'numeric',month:'short'}) : '';
 const $ = s => document.querySelector(s);
+const cap = s => { s=(s||'').toLowerCase(); return s.charAt(0).toUpperCase()+s.slice(1); };
+const trimQty = q => { q=Number(q); return Number.isInteger(q)? String(q) : q.toFixed(1).replace('.',','); };
+let toastT;
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1800); }
 
-// ---- auth gate ----
+// retry once on transient auth/token errors (clock-skew "JWT issued at future")
+async function q(fn){
+  let r = await fn();
+  if (r && r.error && /jwt|token|issued/i.test(r.error.message||'')){
+    try{ await sb.auth.getSession(); }catch(e){}
+    await new Promise(res=>setTimeout(res,600));
+    r = await fn();
+  }
+  return r;
+}
+
 async function boot(){
   const { data:{ session } } = await sb.auth.getSession();
   render(session);
-  sb.auth.onAuthStateChange((_e, s) => render(s));
+  sb.auth.onAuthStateChange((_e,s)=>render(s));
 }
 function render(session){
-  const authed = !!session;
-  $('#login').hidden = authed;
-  $('#app').hidden = !authed;
-  if (authed) loadAll();
+  const authed=!!session;
+  $('#login').hidden=authed; $('#app').hidden=!authed;
+  if(authed) loadAll();
 }
-
-$('#loginForm').addEventListener('submit', async e => {
+$('#loginForm').addEventListener('submit', async e=>{
   e.preventDefault();
-  const email = $('#email').value.trim();
-  const btn = $('#loginBtn'), msg = $('#loginMsg');
-  msg.className = 'msg'; msg.textContent = '';
-  btn.disabled = true; btn.textContent = 'Sending…';
-  const { error } = await sb.auth.signInWithOtp({
-    email, options:{ emailRedirectTo: location.href.split('#')[0] }
-  });
-  btn.disabled = false; btn.textContent = 'Email me a login link';
-  if (error){ msg.className='msg err'; msg.textContent = error.message; }
-  else { msg.textContent = 'Check your inbox for the link ✉️'; }
+  const email=$('#email').value.trim(), btn=$('#loginBtn'), msg=$('#loginMsg');
+  msg.className='msg'; msg.textContent=''; btn.disabled=true; btn.textContent='Sending…';
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: location.href.split('#')[0] } });
+  btn.disabled=false; btn.textContent='Email me a login link';
+  if(error){ msg.className='msg err'; msg.textContent=error.message; }
+  else msg.textContent='Check your inbox for the link ✉️';
 });
-$('#signout').addEventListener('click', () => sb.auth.signOut());
+$('#signout').addEventListener('click', ()=>sb.auth.signOut());
 
-// ---- tabs ----
-document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x===b));
-  ['dash','due','missing'].forEach(id => $('#'+id).hidden = (id !== b.dataset.tab));
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  ['dash','basket','due','missing'].forEach(id=>$('#'+id).hidden=(id!==b.dataset.tab));
 }));
 
-// ---- data ----
-let loaded = false;
-async function loadAll(){ if (loaded) return; loaded = true; loadDash(); loadDue(); loadMissing(); }
+let loaded=false;
+function loadAll(){ if(loaded) return; loaded=true; loadDash(); loadBasket(); loadDue(); loadMissing(); }
 
+// ---------- OVERVIEW ----------
 async function loadDash(){
-  const { data, error } = await sb.from('orders')
+  const { data, error } = await q(()=>sb.from('orders')
     .select('order_id,order_date,receipt_type,order_total_eur,num_food_items')
-    .order('order_date',{ascending:false}).limit(20);
-  if (error) return fail('#ordersList', error);
-  const recent = data.slice(0,8);
-  const avg = recent.reduce((s,o)=>s+Number(o.order_total_eur||0),0)/(recent.length||1);
-  $('#dashStats').innerHTML = tile(eur.format(data[0]?.order_total_eur||0),'last order')
-    + tile(eur.format(avg),'avg (last 8)') + tile(String(data.length? data.length : 0)+'+','orders');
-  $('#ordersList').innerHTML = data.map(o => `<li>
-      <div class="row-main">
-        <div class="row-title">${fmtDate(o.order_date)}</div>
-        <div class="row-sub">${o.num_food_items} items</div>
+    .order('order_date',{ascending:false}).limit(20));
+  if(error) return fail('#ordersList',error);
+  const recent=data.slice(0,8);
+  const avg=recent.reduce((s,o)=>s+Number(o.order_total_eur||0),0)/(recent.length||1);
+  $('#dashStats').innerHTML =
+    tile(eur.format(data[0]?.order_total_eur||0),'last order')+
+    tile(eur.format(avg),'avg (last 8)')+
+    tile(String(data.length)+'+','orders');
+  $('#ordersList').innerHTML = data.map(o=>`<li data-order="${o.order_id}">
+      <div class="rowline tap">
+        <div class="row-main"><div class="row-title">${fmtDate(o.order_date)}</div>
+          <div class="row-sub">${o.num_food_items} items</div></div>
+        ${o.receipt_type==='changed'?'<span class="badge changed">substituted</span>':''}
+        <div class="row-val">${eur.format(o.order_total_eur||0)}</div>
+        <span class="chev">▶</span>
       </div>
-      ${o.receipt_type==='changed'?'<span class="badge changed">substituted</span>':''}
-      <div class="row-val">${eur.format(o.order_total_eur||0)}</div>
+      <div class="items" data-items></div>
     </li>`).join('');
+  $('#ordersList').querySelectorAll('li').forEach(li=>{
+    li.querySelector('.rowline').addEventListener('click',()=>toggleOrder(li));
+  });
+}
+async function toggleOrder(li){
+  const open=li.classList.toggle('open');
+  const box=li.querySelector('[data-items]');
+  if(open && !box.dataset.loaded){
+    box.dataset.loaded='1'; box.innerHTML='<div class="row-sub">Loading…</div>';
+    const { data, error } = await q(()=>sb.from('order_items')
+      .select('product_name_raw,qty,unit,net_eur,is_fee')
+      .eq('order_id',li.dataset.order).order('line_no'));
+    if(error){ box.innerHTML=`<div class="row-sub">${error.message}</div>`; return; }
+    box.innerHTML = data.filter(i=>!i.is_fee).map(i=>`<div class="it">
+        <span class="nm">${cap(i.product_name_raw)} ${i.unit==='kg'?`<span class="muted">${trimQty(i.qty)}kg</span>`:(i.qty>1?`<span class="muted">×${trimQty(i.qty)}</span>`:'')}</span>
+        <span class="vl">${eur.format(i.net_eur||0)}</span></div>`).join('');
+  }
 }
 
-async function loadDue(){
-  const { data, error } = await sb.from('product_frequency')
-    .select('product,last_ordered,days_since_last,median_days_between,median_qty,due_ratio,pct_of_orders')
-    .gte('pct_of_orders',0.25).gte('due_ratio',0.8)
-    .order('due_ratio',{ascending:false}).limit(60);
-  if (error) return fail('#dueList', error);
-  if (!data.length){ $('#dueList').outerHTML = emptyBox('#dueList','✅','Nothing due right now.'); return; }
-  $('#dueList').innerHTML = data.map(p => `<li>
-      <div class="row-main">
-        <div class="row-title">${cap(p.product)}</div>
-        <div class="row-sub">last ${fmtDate(p.last_ordered)} · every ~${Math.round(p.median_days_between)} d</div>
+// ---------- BASKET ----------
+let basket=[];   // [{product_id, default_qty, name, checked, due}]
+async function loadBasket(){
+  const { data, error } = await q(()=>sb.from('standard_basket')
+    .select('product_id,default_qty,products(name)'));
+  if(error) return fail('#basketList',error);
+  const ids=data.map(r=>r.product_id);
+  let dueMap={};
+  if(ids.length){
+    const fr=await q(()=>sb.from('product_frequency').select('product_id,due_ratio').in('product_id',ids));
+    (fr.data||[]).forEach(f=>dueMap[f.product_id]=f.due_ratio);
+  }
+  basket=data.map(r=>({product_id:r.product_id, default_qty:Number(r.default_qty),
+    name:r.products?.name||'?', checked:true, due:(dueMap[r.product_id]||0)>=0.8}))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  renderBasket();
+  loadSuggestions(ids);
+}
+function renderBasket(){
+  $('#basketCount').textContent = basket.length+' items';
+  if(!basket.length){ $('#basketList').innerHTML='<li class="rowline muted" style="padding:18px 15px">Basket is empty — add items below.</li>'; return; }
+  $('#basketList').innerHTML = basket.map((b,i)=>`<li>
+    <div class="rowline">
+      <div class="cbx ${b.checked?'on':''}" data-chk="${i}"><svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="row-main"><div class="row-title">${cap(b.name)}</div>
+        ${b.due?'<div class="row-sub"><span class="badge due" style="padding:1px 6px">due</span></div>':''}</div>
+      <div class="stepper">
+        <button data-dec="${i}">–</button><span class="qv">${trimQty(b.default_qty)}</span><button data-inc="${i}">+</button>
       </div>
+      <button class="xbtn" data-rm="${i}">×</button>
+    </div></li>`).join('');
+}
+$('#basketList').addEventListener('click', async e=>{
+  const t=e.target.closest('[data-chk],[data-inc],[data-dec],[data-rm]'); if(!t) return;
+  if(t.dataset.chk!=null){ const i=+t.dataset.chk; basket[i].checked=!basket[i].checked; renderBasket(); }
+  else if(t.dataset.inc!=null){ const i=+t.dataset.inc; basket[i].default_qty=round1(basket[i].default_qty+1); renderBasket(); saveQty(basket[i]); }
+  else if(t.dataset.dec!=null){ const i=+t.dataset.dec; basket[i].default_qty=Math.max(0,round1(basket[i].default_qty-1)); renderBasket(); saveQty(basket[i]); }
+  else if(t.dataset.rm!=null){ const b=basket[+t.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast('Removed '+cap(b.name)); loadBasket(); }
+});
+const round1=x=>Math.round(x*10)/10;
+async function saveQty(b){ await q(()=>sb.from('standard_basket').update({default_qty:b.default_qty}).eq('product_id',b.product_id)); }
+
+async function loadSuggestions(inIds){
+  const { data } = await q(()=>sb.from('product_frequency')
+    .select('product,product_id,due_ratio,median_qty')
+    .gte('due_ratio',0.9).gte('pct_of_orders',0.25).lt('pct_of_orders',0.5)
+    .order('due_ratio',{ascending:false}).limit(20));
+  const sug=(data||[]).filter(s=>!inIds.includes(s.product_id)).slice(0,8);
+  if(!sug.length){ $('#sugWrap').innerHTML=''; return; }
+  $('#sugWrap').innerHTML = `<h2 style="margin-top:22px">Due, not in your basket <span class="sub">${sug.length}</span></h2>
+    <ul class="list">`+sug.map(s=>`<li><div class="rowline">
+      <div class="row-main"><div class="row-title">${cap(s.product)}</div></div>
+      <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">+ add</button>
+    </div></li>`).join('')+`</ul>`;
+  $('#sugWrap').querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',async()=>{
+    await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:round1(Number(btn.dataset.q)||1)}));
+    toast('Added to basket'); loadBasket();
+  }));
+}
+
+// add-item search
+let searchT;
+$('#addSearch').addEventListener('input', e=>{
+  clearTimeout(searchT); const term=e.target.value.trim();
+  if(term.length<2){ $('#addResults').innerHTML=''; return; }
+  searchT=setTimeout(async()=>{
+    const { data } = await q(()=>sb.from('products').select('id,name')
+      .ilike('name','%'+term+'%').order('name').limit(12));
+    $('#addResults').innerHTML=(data||[]).map(p=>`<li>
+      <span class="row-title">${cap(p.name)}</span>
+      <button class="addbtn" data-padd="${p.id}">+ add</button></li>`).join('');
+    $('#addResults').querySelectorAll('[data-padd]').forEach(btn=>btn.addEventListener('click',async()=>{
+      await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1}));
+      $('#addSearch').value=''; $('#addResults').innerHTML=''; toast('Added to basket'); loadBasket();
+    }));
+  },250);
+});
+
+$('#copyBtn').addEventListener('click',()=>{
+  const lines=basket.filter(b=>b.checked).map(b=>`${trimQty(b.default_qty)} × ${cap(b.name)}`);
+  if(!lines.length){ toast('Nothing checked'); return; }
+  const text=lines.join('\n');
+  navigator.clipboard.writeText(text).then(()=>toast(lines.length+' items copied'))
+    .catch(()=>{ prompt('Copy your list:', text); });
+});
+
+// ---------- DUE ----------
+async function loadDue(){
+  const { data, error } = await q(()=>sb.from('product_frequency')
+    .select('product,last_ordered,days_since_last,median_days_between,median_qty,due_ratio,pct_of_orders')
+    .gte('pct_of_orders',0.25).gte('due_ratio',0.8).order('due_ratio',{ascending:false}).limit(60));
+  if(error) return fail('#dueList',error);
+  if(!data.length){ $('#dueList').innerHTML='<li class="empty"><span class="big">✅</span>Nothing due right now.</li>'; return; }
+  $('#dueList').innerHTML=data.map(p=>`<li><div class="rowline">
+      <div class="row-main"><div class="row-title">${cap(p.product)}</div>
+        <div class="row-sub">last ${fmtDate(p.last_ordered)} · every ~${Math.round(p.median_days_between)} d</div></div>
       <span class="badge due">${p.days_since_last}/${Math.round(p.median_days_between)} d</span>
       <div class="qty">×${trimQty(p.median_qty)}</div>
-    </li>`).join('');
+    </div></li>`).join('');
 }
 
+// ---------- MISSING ----------
 async function loadMissing(){
-  const { data, error } = await sb.from('missing_items')
-    .select('product_name_raw,qty,order_id,orders(order_date)')
-    .order('noted_at',{ascending:false}).limit(200);
-  if (error) return fail('#missingWrap', error);
-  if (!data.length){ $('#missingWrap').innerHTML = emptyHtml('🎉','No missing items on record.'); return; }
-  const latest = data.reduce((m,r)=> (r.orders?.order_date>m? r.orders.order_date : m), '0000');
-  const items = data.filter(r => r.orders?.order_date === latest);
-  $('#missingWrap').innerHTML =
-    `<p class="hint" style="margin:0 2px 12px">Out of stock in your latest order — ${fmtDate(latest)}. Grab these in store.</p>`
-    + `<ul class="list">` + items.map(m => `<li>
-        <div class="row-main"><div class="row-title">${cap(m.product_name_raw)}</div></div>
-        <div class="qty">×${trimQty(m.qty)}</div>
-      </li>`).join('') + `</ul>`;
+  const { data, error } = await q(()=>sb.from('missing_items')
+    .select('product_name_raw,qty,order_id,orders(order_date)').order('noted_at',{ascending:false}).limit(200));
+  if(error) return fail('#missingWrap',error);
+  if(!data.length){ $('#missingWrap').innerHTML='<div class="empty"><span class="big">🎉</span>No missing items on record.</div>'; return; }
+  const latest=data.reduce((m,r)=>(r.orders?.order_date>m? r.orders.order_date : m),'0000');
+  const items=data.filter(r=>r.orders?.order_date===latest);
+  $('#missingWrap').innerHTML=`<p class="hint" style="margin:0 2px 12px">Out of stock in your latest order — ${fmtDate(latest)}. Grab these in store.</p>`+
+    `<ul class="list">`+items.map(m=>`<li><div class="rowline">
+      <div class="row-main"><div class="row-title">${cap(m.product_name_raw)}</div></div>
+      <div class="qty">×${trimQty(m.qty)}</div></div></li>`).join('')+`</ul>`;
 }
 
-// ---- helpers ----
+// helpers
 function tile(n,k){ return `<div class="tile"><div class="n">${n}</div><div class="k">${k}</div></div>`; }
-function cap(s){ s=(s||'').toLowerCase(); return s.charAt(0).toUpperCase()+s.slice(1); }
-function trimQty(q){ q=Number(q); return Number.isInteger(q)? q : q.toFixed(1).replace('.',','); }
-function emptyHtml(big,txt){ return `<div class="empty"><span class="big">${big}</span>${txt}</div>`; }
-function emptyBox(sel,big,txt){ return `<div class="empty" id="${sel.slice(1)}"><span class="big">${big}</span>${txt}</div>`; }
-function fail(sel,err){ const el=$(sel); if(el) el.innerHTML = `<li class="empty" style="color:var(--danger)">${err.message||'Could not load'}</li>`; }
+function fail(sel,err){ const el=$(sel); if(el) el.innerHTML=`<li class="empty" style="color:var(--danger)">${err.message||'Could not load'}</li>`; }
 
 boot();
 </script>
