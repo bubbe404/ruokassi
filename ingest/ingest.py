@@ -25,6 +25,7 @@ import email
 import glob
 import imaplib
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 from email import policy
@@ -32,8 +33,22 @@ from email import policy
 import parser as receipt_parser
 
 IMAP_HOST = 'imap.gmail.com'
-GMAIL_FOLDER = '"[Gmail]/All Mail"'   # search archived + inbox
 GM_QUERY = 'from:s-kaupat.fi subject:kuitti'
+
+
+def _find_all_mail(M):
+    """Locate Gmail's 'All Mail' folder by its \\All special-use flag, which is
+    language-independent (a Finnish account names it '[Gmail]/Kaikki viestit').
+    Falls back to INBOX."""
+    typ, boxes = M.list()
+    if typ == 'OK' and boxes:
+        for b in boxes:
+            line = b.decode(errors='replace')
+            if '\\All' in line:
+                m = re.search(r'"([^"]+)"\s*$', line)
+                if m:
+                    return m.group(1)
+    return 'INBOX'
 
 
 def log(*a):
@@ -49,7 +64,12 @@ def imap_fetch(since_days=None, backfill=False, limit=None):
     M = imaplib.IMAP4_SSL(IMAP_HOST)
     M.login(user, pw)
     try:
-        M.select(GMAIL_FOLDER, readonly=True)
+        folder = _find_all_mail(M)
+        typ, _ = M.select(f'"{folder}"', readonly=True)
+        if typ != 'OK':
+            typ, _ = M.select('INBOX', readonly=True)
+            if typ != 'OK':
+                raise SystemExit(f'could not select a mailbox (tried {folder!r} and INBOX)')
         q = GM_QUERY if backfill else f'{GM_QUERY} newer_than:{since_days}d'
         typ, data = M.search(None, 'X-GM-RAW', f'"{q}"')
         if typ != 'OK':
