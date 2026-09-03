@@ -1,0 +1,42 @@
+name: ingest
+
+on:
+  schedule:
+    # every 2 hours (UTC). Keeps missing-items latency low without a Gmail
+    # OAuth project. A confirmation-anchored tight window is a later refinement.
+    - cron: "0 */2 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "run mode"
+        default: "daily"
+        type: choice
+        options: [daily, backfill, dry-run]
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run ingestion
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_TO: ${{ secrets.NOTIFY_TO }}
+        working-directory: ingest
+        run: |
+          case "${{ github.event.inputs.mode }}" in
+            backfill) python ingest.py --backfill ;;
+            dry-run)  python ingest.py --backfill --dry-run ;;
+            *)        python ingest.py --since 14 ;;
+          esac
