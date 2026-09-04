@@ -223,7 +223,7 @@
       <p class="hint" data-i18n="due.hint">Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.</p>
     </section>
 
-    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-05-j</div>
+    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-05-k</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -332,7 +332,7 @@ async function toggleOrder(li){
       .eq('order_id',li.dataset.order).order('line_no'));
     if(error){ box.innerHTML=`<div class="row-sub">${error.message}</div>`; return; }
     box.innerHTML = data.filter(i=>!i.is_fee).map(i=>`<div class="it">
-        <span class="nm">${cap(i.product_name_raw)} ${i.unit==='kg'?`<span class="muted">${trimQty(i.qty)}kg</span>`:(i.qty>1?`<span class="muted">×${trimQty(i.qty)}</span>`:'')}</span>
+        <span class="nm">${capH(i.product_name_raw)} ${i.unit==='kg'?`<span class="muted">${trimQty(i.qty)}kg</span>`:(i.qty>1?`<span class="muted">×${trimQty(i.qty)}</span>`:'')}</span>
         <span class="vl">${eur.format(i.net_eur||0)}</span></div>`).join('');
   }
 }
@@ -368,7 +368,7 @@ function renderBasket(){
   $('#basketList').innerHTML = basket.map((b,i)=>`<li>
     <div class="rowline">
       <div class="cbx ${b.checked?'on':''}" data-chk="${i}"><svg viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="row-main"><div class="row-title">${cap(b.name)}</div>
+      <div class="row-main"><div class="row-title">${capH(b.name)}</div>
         <div class="row-sub" style="display:flex;gap:6px;align-items:center;margin-top:5px">${byChip(b.by)}${b.due?'<span class="badge due" style="padding:1px 6px">'+t('basket.due_badge')+'</span>':''}</div></div>
       <div class="stepper">
         <button data-dec="${i}">–</button><span class="qv">${trimQty(b.default_qty)}</span><button data-inc="${i}">+</button>
@@ -395,7 +395,7 @@ async function loadSuggestions(inIds){
   if(!sug.length){ $('#sugWrap').innerHTML=''; return; }
   $('#sugWrap').innerHTML = `<h2 style="margin-top:22px">${t('sug.title')} <span class="sub">${sug.length}</span></h2>
     <ul class="list">`+sug.map(s=>`<li><div class="rowline">
-      <div class="row-main"><div class="row-title">${cap(s.product)}</div></div>
+      <div class="row-main"><div class="row-title">${capH(s.product)}</div></div>
       <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">${t('sug.add')}</button>
     </div></li>`).join('')+`</ul>`;
   $('#sugWrap').querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',async()=>{
@@ -413,7 +413,7 @@ $('#addSearch').addEventListener('input', e=>{
     const { data } = await q(()=>sb.from('products').select('id,name')
       .ilike('name','%'+term+'%').order('name').limit(12));
     const rows=(data||[]).map(p=>`<li>
-      <span class="row-title">${cap(p.name)}</span>
+      <span class="row-title">${capH(p.name)}</span>
       <button class="addbtn" data-padd="${p.id}">${t('sug.add')}</button></li>`).join('');
     // free-text: add anything not in the catalog (e.g. "Fairy", "grillihiilet")
     $('#addResults').innerHTML=rows+`<li>
@@ -457,7 +457,7 @@ async function loadDue(){
   if(error) return fail('#dueList',error);
   if(!data.length){ $('#dueList').innerHTML='<li class="empty"><span class="big">✅</span>'+t('due.empty')+'</li>'; return; }
   $('#dueList').innerHTML=data.map(p=>`<li><div class="rowline">
-      <div class="row-main"><div class="row-title">${cap(p.product)}</div>
+      <div class="row-main"><div class="row-title">${capH(p.product)}</div>
         <div class="row-sub">${t('due.last_every', fmtDate(p.last_ordered), Math.round(p.median_days_between))}</div></div>
       <span class="badge due">${t('due.badge_days', p.days_since_last, Math.round(p.median_days_between))}</span>
       <div class="qty">×${trimQty(p.median_qty)}</div>
@@ -483,7 +483,7 @@ function renderMissingSection(){
     <p class="hint" style="margin:0 2px 10px">${t('miss.hint', fmtDate(missLatest))}</p>
     <ul class="list">`+missWeek.map((m,i)=>`<li><div class="rowline">
       <div class="cbx ${m.checked?'on':''}" data-mchk="${i}">${CHK}</div>
-      <div class="row-main"><div class="row-title">${cap(m.name)}</div></div>
+      <div class="row-main"><div class="row-title">${capH(m.name)}</div></div>
       <span class="badge miss" style="padding:1px 6px">${t('miss.badge')}</span>
       <div class="qty">×${trimQty(m.qty)}</div></div></li>`).join('')+`</ul>`;
 }
@@ -555,7 +555,7 @@ function optRow(o,i){
   if(o.product_id){
     return `<li><div class="rowline">
       <div class="cbx ${o.checked?'on':''}" data-ochk="${i}">${CHK}</div>
-      <div class="row-main"><div class="row-title">${cap(o.name)}</div>
+      <div class="row-main"><div class="row-title">${capH(o.name)}</div>
         <div class="row-sub" style="margin-top:4px;display:flex;gap:6px;align-items:center">${badges}${o.recipe?`<span class="muted" style="font-size:.72rem">${esc(o.recipe)}</span>`:''}</div></div>
       ${o.qty?`<div class="qty">×${trimQty(o.qty)}</div>`:''}
       <button class="xbtn" data-odismiss="${o.ing_id}" title="${t('menu.optional_badge')}">×</button></div></li>`;
@@ -574,7 +574,7 @@ function renderMenuSection(){
   if(menuItems.length){
     html+=`<ul class="list">`+menuItems.map((m,i)=>`<li><div class="rowline">
       <div class="cbx ${m.checked?'on':''}" data-nchk="${i}">${CHK}</div>
-      <div class="row-main"><div class="row-title">${cap(m.name)}</div>
+      <div class="row-main"><div class="row-title">${capH(m.name)}</div>
         <div class="row-sub" style="margin-top:4px;display:flex;gap:6px;align-items:center">${m.inBasket?`<span class="badge" style="padding:1px 6px">${t('menu.in_basket')}</span>`:''}${m.recipe?`<span class="muted" style="font-size:.72rem">${esc(m.recipe)}</span>`:''}</div></div>
       ${m.qty?`<div class="qty">×${trimQty(m.qty)}</div>`:''}</div></li>`).join('')+`</ul>`;
   }
@@ -619,14 +619,14 @@ $('#menuWrap').addEventListener('input',e=>{
   nresT=setTimeout(async()=>{
     const { data } = await q(()=>sb.from('products').select('id,name').ilike('name','%'+term+'%').order('name').limit(8));
     const rows=(data||[]).map(p=>`<li><div class="rowline">
-      <div class="row-main"><div class="row-title">${cap(p.name)}</div></div>
+      <div class="row-main"><div class="row-title">${capH(p.name)}</div></div>
       ${optional
         ? `<button class="addbtn" data-opick="${p.id}" data-oid="${esc(inp.dataset.oid)}">${t('menu.use')}</button>`
         : `<button class="addbtn" data-pick="${p.id}" data-key="${esc(inp.dataset.key)}">${t('menu.use')}</button>`}
       </div></li>`).join('');
     // always offer "add as new" so an ingredient never bought can still be mapped
     const addNew=`<li><div class="rowline">
-      <div class="row-main"><div class="row-title" style="color:var(--accent-ink)">${t('menu.add_new', cap(term))}</div></div>
+      <div class="row-main"><div class="row-title" style="color:var(--accent-ink)">${t('menu.add_new', capH(term))}</div></div>
       ${optional
         ? `<button class="addbtn" data-newoid="${esc(inp.dataset.oid)}" data-term="${esc(term)}">${t('menu.use')}</button>`
         : `<button class="addbtn" data-newkey="${esc(inp.dataset.key)}" data-term="${esc(term)}">${t('menu.use')}</button>`}
@@ -666,7 +666,8 @@ function fail(sel,err){ const el=$(sel); if(el) el.innerHTML=`<li class="empty" 
 
 // ---------- PLAN ----------
 let curPlan=null, recipes=[], slots=[];
-const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const capH=s=>esc(cap(s));   // HTML-safe capitalize (use in innerHTML; plain cap() for toasts/clipboard)
 function monday(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
 function normKey(l){ return (l||'').toLowerCase().replace(/^[\s\d.,/-]+/,'').replace(/^(g|kg|dl|l|ml|kpl|tl|rkl|prk|ps|pkt|ras|pkl)\b\.?\s*/,'').trim().split(/\s+/).slice(0,2).join(' '); }
 function parseQty(l){ const m=(l||'').match(/^\s*([\d.,]+)/); return m? Number(m[1].replace(',','.')) : null; }
@@ -800,10 +801,13 @@ $('#novelWrap').addEventListener('click',async e=>{
   novelProposals.splice(i,1); renderNovel(); toast(t('toast.novel_added'));
   loadRecipes(); loadSlots();
 });
+const EFFORTS=['quick','normal','long'], SEASONS=['easter','vappu','midsummer','christmas'];
 async function addNovelToLibrary(n){
-  const rec={ name:(n.name||'').trim()||'Uusi resepti', is_vegetarian:!!n.is_vegetarian, has_fish:!!n.has_fish,
+  const effort=EFFORTS.includes(n.effort)?n.effort:'normal';
+  const season=SEASONS.includes(n.season)?n.season:null;
+  const rec={ name:(n.name||'').trim().slice(0,120)||'Uusi resepti', is_vegetarian:!!n.is_vegetarian, has_fish:!!n.has_fish,
     has_legume:!!n.has_legume, has_tomato_sauce:!!n.has_tomato_sauce, freezer_ok:!!n.freezer_ok,
-    is_bread_centric:!!n.is_bread_centric, effort:n.effort||'normal', season:n.season||null, source:'suggested', on_trial:true };
+    is_bread_centric:!!n.is_bread_centric, effort, season, source:'suggested', on_trial:true };
   const ins=await q(()=>sb.from('recipes').insert(rec).select().single());
   const rid=ins.data&&ins.data.id; if(!rid) return null;
   const lines=(Array.isArray(n.ingredients)?n.ingredients:[]).map(l=>String(l).trim()).filter(Boolean);
@@ -814,7 +818,7 @@ async function addNovelToLibrary(n){
   return rid;
 }
 function tagsOf(r){ const arr=[]; if(r.is_vegetarian)arr.push(t('tag.veg')); if(r.has_fish)arr.push(t('tag.fish')); if(r.has_legume)arr.push(t('tag.legume')); if(r.has_tomato_sauce)arr.push(t('tag.tomato')); if(r.freezer_ok)arr.push(t('tag.freezer')); if(r.is_bread_centric)arr.push(t('tag.bread')); if(r.batch>1)arr.push(t('tag.batch', r.batch)); if(r.effort&&r.effort!=='normal')arr.push(t('effort.'+r.effort)); if(r.season)arr.push(t('season.'+r.season)); return arr; }
-function tagHtml(r){ const tg=tagsOf(r); return tg.length? tg.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">'+t('tags.no_tags')+'</span>'; }
+function tagHtml(r){ const tg=tagsOf(r); return tg.length? tg.map(x=>`<span class="tg">${esc(x)}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">'+t('tags.no_tags')+'</span>'; }
 function renderRecipes(){
   $('#recipeList').innerHTML = recipes.length? recipes.map(r=>`<li><div class="rowline">
     <div class="row-main"><div class="row-title">${esc(r.name)}</div><div class="row-sub" style="margin-top:5px">${tagHtml(r)}</div></div>
