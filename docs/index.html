@@ -207,6 +207,7 @@
       <h2 style="margin-top:20px"><span data-i18n="plan.menu">Ruokalista</span> <span class="sub" id="menuCount"></span></h2>
       <button class="addbtn" id="suggestBtn" data-i18n="plan.suggest">✨ Ehdota viikko</button>
       <ul class="list" id="menuList" style="margin-top:10px"></ul>
+      <div id="novelWrap"></div>
 
       <h2 style="margin-top:24px"><span data-i18n="plan.recipes">Reseptit</span> <span class="sub" id="recCount"></span></h2>
       <button class="addbtn" id="newRecipeBtn" data-i18n="plan.new_recipe">+ Uusi resepti</button>
@@ -221,7 +222,7 @@
       <p class="hint" data-i18n="due.hint">Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.</p>
     </section>
 
-    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-04-g</div>
+    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-04-h</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -232,7 +233,7 @@ const SB_URL = 'https://nzpkmtwmdruqcsussxgr.supabase.co';
 // classic anon key (widely compatible); RLS gates all access.
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGttdHdtZHJ1cWNzdXNzeGdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNTc3NTgsImV4cCI6MjEwMzkzMzc1OH0.wxvqTxwPOIYpkftS6qT6VjKn2-2ot0fjKgCEkpV_Rfs';
 const sb = supabase.createClient(SB_URL, SB_KEY);
-const I18N = { "fi": {"login.subtitle": "Viikon ruoat yhdellä silmäyksellä.", "login.email_ph": "sinä@esimerkki.fi", "login.submit": "Lähetä kirjautumislinkki", "login.sending": "Lähetetään…", "login.check_inbox": "Tarkista sähköpostisi — linkki on matkalla ✉️", "nav.signout": "Kirjaudu ulos", "tab.plan": "Suunnittelu", "tab.basket": "Kori", "tab.orders": "Tilaukset", "tab.due": "Loppumassa", "common.loading": "Ladataan…", "common.n_items": "{0} tuotetta", "dash.title": "Viimeisimmät tilaukset", "dash.sub": "napauta avataksesi", "dash.tile_last": "viime tilaus", "dash.tile_avg": "ka (viim. 8)", "dash.tile_orders": "tilausta", "dash.substituted": "korvattu", "basket.title": "Viikkokori", "basket.add_ph": "Lisää tuote koriin…", "basket.copy": "Kopioi valitut", "basket.legend_auto": "historian perusteella", "basket.legend_who": "kuka lisäsi", "basket.empty": "Kori on tyhjä — lisää tuotteita alta.", "basket.due_badge": "loppuu", "basket.added_by": "lisännyt {0}", "basket.hint": "Vakioviikkokorisi kappaleina. Rastita mitä tarvitset tällä viikolla, säädä määriä ja kopioi lista S-kauppaan. Muutokset tallentuvat ensi viikoksi. Painon mukaan myytäviä ei voi laskea automaattisesti, joten ne alkavat pieninä — aseta kerran ja ne pysyvät.", "sug.title": "Loppumassa, ei korissa", "sug.add": "+ lisää", "toast.added_basket": "Lisätty koriin", "toast.removed": "Poistettu {0}", "toast.nothing_checked": "Ei valintoja", "toast.copied": "{0} tuotetta kopioitu", "toast.matched": "Yhdistetty — muistissa", "toast.opt_chosen": "Valittu tälle viikolle", "toast.opt_removed": "Poistettu tältä viikolta", "toast.opt_restored": "Palautettu", "toast.added_menu": "Lisätty ruokalistalle", "toast.suggested": "Ehdotettu {0} ateriaa — muokkaa vapaasti", "toast.suggest_none": "Ei sopivia reseptejä — lisää lisää reseptejä kirjastoon", "toast.suggest_full": "Ruokalista on jo täynnä", "toast.deleted": "Poistettu", "toast.saved": "Tallennettu", "toast.name_required": "Nimi vaaditaan", "prompt.copy_list": "Kopioi lista:", "due.title": "Loppumassa", "due.empty": "Mikään ei ole loppumassa juuri nyt.", "due.last_every": "viimeksi {0} · noin {1} pv välein", "due.badge_days": "{0}/{1} pv", "due.hint": "Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.", "miss.title": "Puuttui viime tilauksesta", "miss.hint": "Loppu kaupasta {0} — lisää tähän tai hae myymälästä.", "miss.badge": "puuttui", "menu.title": "Tämän viikon ruokalistalta", "menu.match_hint": "Yhdistä tuote kerran, niin ruokassi muistaa sen:", "menu.match_ph": "yhdistä tuote…", "menu.use": "valitse", "menu.optional_badge": "valinn.", "menu.in_basket": "jo korissa", "menu.restore": "palauta", "menu.opt_hint": "Valinnaiset — poista tältä viikolta tai valitse tuote vain tälle viikolle:", "menu.add_new": "Lisää uutena: {0}", "menu.empty": "Ei valittuja aterioita. Lisää alla olevista resepteistä.", "menu.of_dinners": " / {0} illallista", "plan.title": "Tämä viikko", "plan.dinners": "Illallisia suunnitteilla", "plan.lunches": "Sisällytä lounaat", "plan.note_ph": "Tällä viikolla: vieraita, matkoilla, ulkona syöntiä…", "plan.menu": "Ruokalista", "plan.recipes": "Reseptit", "plan.new_recipe": "+ Uusi resepti", "plan.suggest": "✨ Ehdota viikko", "plan.suggesting": "Ehdotetaan…", "plan.week_label": "vko {0}", "plan.hint": "Perheen vakioruoat. Valitse viikon illalliset ruokalistalle — ylläolevat merkit tarkistavat talon säännöt reaaliajassa. Reseptin ainekset siirtyvät automaattisesti Koriin.", "recipes.empty": "Ei vielä reseptejä — lisää suosikkiruokasi “+ Uusi resepti” -painikkeella.", "recipe.add_week": "+ viikko", "rules.pick": "Valitse aterioita tarkistaaksesi säännöt", "rules.veg": "kasvis {0}%", "rules.fish": "kala ≤1", "rules.tomato": "tomaatti ≤1", "rules.legume": "palkokasvi ≤1", "rules.freezer": "pakastin ≥1", "rules.bread": "ei leipää", "tags.no_tags": "ei merkkejä", "tag.veg": "kasvis", "tag.fish": "kala", "tag.legume": "palko", "tag.tomato": "tomaatti", "tag.freezer": "pakaste", "tag.bread": "leipä", "tag.batch": "{0}× erä", "effort.quick": "nopea", "effort.normal": "normaali", "effort.long": "pitkä", "season.any": "mikä tahansa sesonki", "season.easter": "pääsiäinen", "season.vappu": "vappu", "season.midsummer": "juhannus", "season.christmas": "joulu", "batch.1": "yksi erä", "batch.2": "tupla-erä (2×)", "batch.3": "tripla-erä (3×)", "batch.4": "4× erä", "form.name_ph": "Reseptin nimi", "form.tag_veg": "kasvis", "form.tag_fish": "kala", "form.tag_legume": "palkokasvi", "form.tag_tomato": "tomaattikastike", "form.tag_freezer": "pakastuu", "form.tag_bread": "leipäpohjainen", "form.ing_ph": "Ainekset — määrä + aine per rivi. Merkitse valinnainen ?-merkillä. Esim.\n2 sipulia\n? 1 chili\n400 g härkäpapua", "form.save": "Tallenna resepti", "form.cancel": "Peruuta", "form.delete": "Poista"}, "en": {"login.subtitle": "Weekly food, at a glance.", "login.email_ph": "you@example.com", "login.submit": "Email me a login link", "login.sending": "Sending…", "login.check_inbox": "Check your inbox for the link ✉️", "nav.signout": "Sign out", "tab.plan": "Plan", "tab.basket": "Basket", "tab.orders": "Orders", "tab.due": "Due", "common.loading": "Loading…", "common.n_items": "{0} items", "dash.title": "Recent orders", "dash.sub": "tap to expand", "dash.tile_last": "last order", "dash.tile_avg": "avg (last 8)", "dash.tile_orders": "orders", "dash.substituted": "substituted", "basket.title": "Weekly basket", "basket.add_ph": "Add an item to your basket…", "basket.copy": "Copy checked items", "basket.legend_auto": "from your history", "basket.legend_who": "who added it", "basket.empty": "Basket is empty — add items below.", "basket.due_badge": "due", "basket.added_by": "added by {0}", "basket.hint": "Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.", "sug.title": "Due, not in your basket", "sug.add": "+ add", "toast.added_basket": "Added to basket", "toast.removed": "Removed {0}", "toast.nothing_checked": "Nothing checked", "toast.copied": "{0} items copied", "toast.matched": "Matched — remembered", "toast.opt_chosen": "Chosen for this week", "toast.opt_removed": "Removed for this week", "toast.opt_restored": "Restored", "toast.added_menu": "Added to menu", "toast.suggested": "Suggested {0} meals — edit freely", "toast.suggest_none": "No suitable recipes — add more to your library", "toast.suggest_full": "Menu is already full", "toast.deleted": "Deleted", "toast.saved": "Saved", "toast.name_required": "Name required", "prompt.copy_list": "Copy your list:", "due.title": "Due to reorder", "due.empty": "Nothing due right now.", "due.last_every": "last {0} · every ~{1} d", "due.badge_days": "{0}/{1} d", "due.hint": "Staples bought in ≥25% of orders and now past their usual interval. Suggested quantity is your median.", "miss.title": "Missing from last order", "miss.hint": "Out of stock {0} — re-add here or grab in store.", "miss.badge": "missing", "menu.title": "From this week's menu", "menu.match_hint": "Match a product once and ruokassi remembers it:", "menu.match_ph": "match a product…", "menu.use": "use", "menu.optional_badge": "optional", "menu.in_basket": "in basket", "menu.restore": "restore", "menu.opt_hint": "Optional — remove for this week, or pick a product just for this week:", "menu.add_new": "Add as new: {0}", "menu.empty": "No meals picked. Add from your recipes below.", "menu.of_dinners": " / {0} dinners", "plan.title": "This week", "plan.dinners": "Dinners to plan", "plan.lunches": "Include lunches", "plan.note_ph": "This week: guests, away, eating out…", "plan.menu": "Menu", "plan.recipes": "Recipes", "plan.new_recipe": "+ New recipe", "plan.suggest": "✨ Suggest week", "plan.suggesting": "Suggesting…", "plan.week_label": "week of {0}", "plan.hint": "Your family's go-to meals. Pick this week's dinners into the menu — the chips above check your house rules live. Recipe ingredients flow into the Basket automatically.", "recipes.empty": "No recipes yet — add your go-to meals with “+ New recipe”.", "recipe.add_week": "+ week", "rules.pick": "Pick meals to check house rules", "rules.veg": "veg {0}%", "rules.fish": "fish ≤1", "rules.tomato": "tomato ≤1", "rules.legume": "legume ≤1", "rules.freezer": "freezer ≥1", "rules.bread": "no bread", "tags.no_tags": "no tags", "tag.veg": "veg", "tag.fish": "fish", "tag.legume": "legume", "tag.tomato": "tomato", "tag.freezer": "freezer", "tag.bread": "bread", "tag.batch": "{0}× batch", "effort.quick": "quick", "effort.normal": "normal", "effort.long": "long", "season.any": "any season", "season.easter": "easter", "season.vappu": "vappu", "season.midsummer": "midsummer", "season.christmas": "christmas", "batch.1": "single batch", "batch.2": "double (2×)", "batch.3": "triple (3×)", "batch.4": "4× batch", "form.name_ph": "Recipe name", "form.tag_veg": "vegetarian", "form.tag_fish": "fish", "form.tag_legume": "legume", "form.tag_tomato": "tomato sauce", "form.tag_freezer": "freezer-ok", "form.tag_bread": "bread-centric", "form.ing_ph": "Ingredients — amount + item per line. Mark optional with ?. E.g.\n2 onions\n? 1 chili\n400 g fava beans", "form.save": "Save recipe", "form.cancel": "Cancel", "form.delete": "Delete"}, "sv": {} };
+const I18N = { "fi": {"login.subtitle": "Viikon ruoat yhdellä silmäyksellä.", "login.email_ph": "sinä@esimerkki.fi", "login.submit": "Lähetä kirjautumislinkki", "login.sending": "Lähetetään…", "login.check_inbox": "Tarkista sähköpostisi — linkki on matkalla ✉️", "nav.signout": "Kirjaudu ulos", "tab.plan": "Suunnittelu", "tab.basket": "Kori", "tab.orders": "Tilaukset", "tab.due": "Loppumassa", "common.loading": "Ladataan…", "common.n_items": "{0} tuotetta", "dash.title": "Viimeisimmät tilaukset", "dash.sub": "napauta avataksesi", "dash.tile_last": "viime tilaus", "dash.tile_avg": "ka (viim. 8)", "dash.tile_orders": "tilausta", "dash.substituted": "korvattu", "basket.title": "Viikkokori", "basket.add_ph": "Lisää tuote koriin…", "basket.copy": "Kopioi valitut", "basket.legend_auto": "historian perusteella", "basket.legend_who": "kuka lisäsi", "basket.empty": "Kori on tyhjä — lisää tuotteita alta.", "basket.due_badge": "loppuu", "basket.added_by": "lisännyt {0}", "basket.hint": "Vakioviikkokorisi kappaleina. Rastita mitä tarvitset tällä viikolla, säädä määriä ja kopioi lista S-kauppaan. Muutokset tallentuvat ensi viikoksi. Painon mukaan myytäviä ei voi laskea automaattisesti, joten ne alkavat pieninä — aseta kerran ja ne pysyvät.", "sug.title": "Loppumassa, ei korissa", "sug.add": "+ lisää", "toast.added_basket": "Lisätty koriin", "toast.removed": "Poistettu {0}", "toast.nothing_checked": "Ei valintoja", "toast.copied": "{0} tuotetta kopioitu", "toast.matched": "Yhdistetty — muistissa", "toast.opt_chosen": "Valittu tälle viikolle", "toast.opt_removed": "Poistettu tältä viikolta", "toast.opt_restored": "Palautettu", "toast.added_menu": "Lisätty ruokalistalle", "toast.suggested": "Ehdotettu {0} ateriaa — muokkaa vapaasti", "toast.suggest_none": "Ei sopivia reseptejä — lisää lisää reseptejä kirjastoon", "toast.suggest_full": "Ruokalista on jo täynnä", "toast.novel_added": "Lisätty kirjastoon", "toast.deleted": "Poistettu", "toast.saved": "Tallennettu", "toast.name_required": "Nimi vaaditaan", "prompt.copy_list": "Kopioi lista:", "due.title": "Loppumassa", "due.empty": "Mikään ei ole loppumassa juuri nyt.", "due.last_every": "viimeksi {0} · noin {1} pv välein", "due.badge_days": "{0}/{1} pv", "due.hint": "Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.", "miss.title": "Puuttui viime tilauksesta", "miss.hint": "Loppu kaupasta {0} — lisää tähän tai hae myymälästä.", "miss.badge": "puuttui", "menu.title": "Tämän viikon ruokalistalta", "menu.match_hint": "Yhdistä tuote kerran, niin ruokassi muistaa sen:", "menu.match_ph": "yhdistä tuote…", "menu.use": "valitse", "menu.optional_badge": "valinn.", "menu.in_basket": "jo korissa", "menu.restore": "palauta", "menu.opt_hint": "Valinnaiset — poista tältä viikolta tai valitse tuote vain tälle viikolle:", "menu.add_new": "Lisää uutena: {0}", "menu.empty": "Ei valittuja aterioita. Lisää alla olevista resepteistä.", "menu.of_dinners": " / {0} illallista", "plan.title": "Tämä viikko", "plan.dinners": "Illallisia suunnitteilla", "plan.lunches": "Sisällytä lounaat", "plan.note_ph": "Tällä viikolla: vieraita, matkoilla, ulkona syöntiä…", "plan.menu": "Ruokalista", "plan.recipes": "Reseptit", "plan.new_recipe": "+ Uusi resepti", "plan.suggest": "✨ Ehdota viikko", "plan.suggesting": "Ehdotetaan…", "plan.novel_title": "Uudet ideat ✨", "novel.add_library": "Lisää kirjastoon", "novel.add_week": "Lisää viikolle", "plan.week_label": "vko {0}", "plan.hint": "Perheen vakioruoat. Valitse viikon illalliset ruokalistalle — ylläolevat merkit tarkistavat talon säännöt reaaliajassa. Reseptin ainekset siirtyvät automaattisesti Koriin.", "recipes.empty": "Ei vielä reseptejä — lisää suosikkiruokasi “+ Uusi resepti” -painikkeella.", "recipe.add_week": "+ viikko", "rules.pick": "Valitse aterioita tarkistaaksesi säännöt", "rules.veg": "kasvis {0}%", "rules.fish": "kala ≤1", "rules.tomato": "tomaatti ≤1", "rules.legume": "palkokasvi ≤1", "rules.freezer": "pakastin ≥1", "rules.bread": "ei leipää", "tags.no_tags": "ei merkkejä", "tag.veg": "kasvis", "tag.fish": "kala", "tag.legume": "palko", "tag.tomato": "tomaatti", "tag.freezer": "pakaste", "tag.bread": "leipä", "tag.batch": "{0}× erä", "effort.quick": "nopea", "effort.normal": "normaali", "effort.long": "pitkä", "season.any": "mikä tahansa sesonki", "season.easter": "pääsiäinen", "season.vappu": "vappu", "season.midsummer": "juhannus", "season.christmas": "joulu", "batch.1": "yksi erä", "batch.2": "tupla-erä (2×)", "batch.3": "tripla-erä (3×)", "batch.4": "4× erä", "form.name_ph": "Reseptin nimi", "form.tag_veg": "kasvis", "form.tag_fish": "kala", "form.tag_legume": "palkokasvi", "form.tag_tomato": "tomaattikastike", "form.tag_freezer": "pakastuu", "form.tag_bread": "leipäpohjainen", "form.ing_ph": "Ainekset — määrä + aine per rivi. Merkitse valinnainen ?-merkillä. Esim.\n2 sipulia\n? 1 chili\n400 g härkäpapua", "form.save": "Tallenna resepti", "form.cancel": "Peruuta", "form.delete": "Poista"}, "en": {"login.subtitle": "Weekly food, at a glance.", "login.email_ph": "you@example.com", "login.submit": "Email me a login link", "login.sending": "Sending…", "login.check_inbox": "Check your inbox for the link ✉️", "nav.signout": "Sign out", "tab.plan": "Plan", "tab.basket": "Basket", "tab.orders": "Orders", "tab.due": "Due", "common.loading": "Loading…", "common.n_items": "{0} items", "dash.title": "Recent orders", "dash.sub": "tap to expand", "dash.tile_last": "last order", "dash.tile_avg": "avg (last 8)", "dash.tile_orders": "orders", "dash.substituted": "substituted", "basket.title": "Weekly basket", "basket.add_ph": "Add an item to your basket…", "basket.copy": "Copy checked items", "basket.legend_auto": "from your history", "basket.legend_who": "who added it", "basket.empty": "Basket is empty — add items below.", "basket.due_badge": "due", "basket.added_by": "added by {0}", "basket.hint": "Your standing weekly basket, in pieces. Tick what you need this week, tweak amounts, then copy the list into S-kaupat. Edits are saved for next week. Produce sold by weight can't be auto-counted, so those start low — set them once and they stick.", "sug.title": "Due, not in your basket", "sug.add": "+ add", "toast.added_basket": "Added to basket", "toast.removed": "Removed {0}", "toast.nothing_checked": "Nothing checked", "toast.copied": "{0} items copied", "toast.matched": "Matched — remembered", "toast.opt_chosen": "Chosen for this week", "toast.opt_removed": "Removed for this week", "toast.opt_restored": "Restored", "toast.added_menu": "Added to menu", "toast.suggested": "Suggested {0} meals — edit freely", "toast.suggest_none": "No suitable recipes — add more to your library", "toast.suggest_full": "Menu is already full", "toast.novel_added": "Added to library", "toast.deleted": "Deleted", "toast.saved": "Saved", "toast.name_required": "Name required", "prompt.copy_list": "Copy your list:", "due.title": "Due to reorder", "due.empty": "Nothing due right now.", "due.last_every": "last {0} · every ~{1} d", "due.badge_days": "{0}/{1} d", "due.hint": "Staples bought in ≥25% of orders and now past their usual interval. Suggested quantity is your median.", "miss.title": "Missing from last order", "miss.hint": "Out of stock {0} — re-add here or grab in store.", "miss.badge": "missing", "menu.title": "From this week's menu", "menu.match_hint": "Match a product once and ruokassi remembers it:", "menu.match_ph": "match a product…", "menu.use": "use", "menu.optional_badge": "optional", "menu.in_basket": "in basket", "menu.restore": "restore", "menu.opt_hint": "Optional — remove for this week, or pick a product just for this week:", "menu.add_new": "Add as new: {0}", "menu.empty": "No meals picked. Add from your recipes below.", "menu.of_dinners": " / {0} dinners", "plan.title": "This week", "plan.dinners": "Dinners to plan", "plan.lunches": "Include lunches", "plan.note_ph": "This week: guests, away, eating out…", "plan.menu": "Menu", "plan.recipes": "Recipes", "plan.new_recipe": "+ New recipe", "plan.suggest": "✨ Suggest week", "plan.suggesting": "Suggesting…", "plan.novel_title": "New ideas ✨", "novel.add_library": "Add to library", "novel.add_week": "Add to week", "plan.week_label": "week of {0}", "plan.hint": "Your family's go-to meals. Pick this week's dinners into the menu — the chips above check your house rules live. Recipe ingredients flow into the Basket automatically.", "recipes.empty": "No recipes yet — add your go-to meals with “+ New recipe”.", "recipe.add_week": "+ week", "rules.pick": "Pick meals to check house rules", "rules.veg": "veg {0}%", "rules.fish": "fish ≤1", "rules.tomato": "tomato ≤1", "rules.legume": "legume ≤1", "rules.freezer": "freezer ≥1", "rules.bread": "no bread", "tags.no_tags": "no tags", "tag.veg": "veg", "tag.fish": "fish", "tag.legume": "legume", "tag.tomato": "tomato", "tag.freezer": "freezer", "tag.bread": "bread", "tag.batch": "{0}× batch", "effort.quick": "quick", "effort.normal": "normal", "effort.long": "long", "season.any": "any season", "season.easter": "easter", "season.vappu": "vappu", "season.midsummer": "midsummer", "season.christmas": "christmas", "batch.1": "single batch", "batch.2": "double (2×)", "batch.3": "triple (3×)", "batch.4": "4× batch", "form.name_ph": "Recipe name", "form.tag_veg": "vegetarian", "form.tag_fish": "fish", "form.tag_legume": "legume", "form.tag_tomato": "tomato sauce", "form.tag_freezer": "freezer-ok", "form.tag_bread": "bread-centric", "form.ing_ph": "Ingredients — amount + item per line. Mark optional with ?. E.g.\n2 onions\n? 1 chili\n400 g fava beans", "form.save": "Save recipe", "form.cancel": "Cancel", "form.delete": "Delete"}, "sv": {} };
 let LANG=(function(){try{var l=localStorage.getItem('ruokassi_lang');return (l&&I18N[l])?l:'fi';}catch(e){return 'fi';}})();
 function t(k){var d=I18N[LANG]||{};var s=(k in d)?d[k]:((k in I18N.en)?I18N.en[k]:((k in I18N.fi)?I18N.fi[k]:k));var a=arguments;return String(s).replace(/\{(\d+)\}/g,function(_,i){var v=a[(+i)+1];return v===undefined?'':v;});}
 function applyStaticI18n(){document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.getAttribute('data-i18n'));});document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.setAttribute('placeholder',t(el.getAttribute('data-i18n-ph')));});document.documentElement.lang=LANG;}
@@ -683,49 +684,99 @@ function currentHoliday(){ const m=new Date().getMonth()+1, d=new Date().getDate
   if((m===4&&d>=20)||(m===5&&d<=5)) return 'vappu';
   if(m===6&&d>=15) return 'midsummer';
   return null; }
+let novelProposals=[];   // LLM-proposed recipes not in the library yet (M4.2)
 async function suggestWeek(){
   if(!curPlan) return;
   const btn=$('#suggestBtn'); btn.disabled=true; btn.textContent=t('plan.suggesting');
   try{
-    const dinners=curPlan.dinners||0;
-    const need=dinners - slots.length;
+    const need=(curPlan.dinners||0) - slots.length;
     if(need<=0){ toast(t('toast.suggest_full')); return; }
-    // recency: last week each recipe was planned (excluding the current plan)
-    const hist=await q(()=>sb.from('meal_plan_slots').select('recipe_id,meal_plans(week_start)').neq('plan_id',curPlan.id));
-    const lastWeek={}; (hist.data||[]).forEach(h=>{ const w=h.meal_plans&&h.meal_plans.week_start; if(w && (!lastWeek[h.recipe_id]||w>lastWeek[h.recipe_id])) lastWeek[h.recipe_id]=w; });
-    const inWeek=new Set(slots.map(s=>s.recipe_id));
-    const holiday=currentHoliday(); const today=new Date();
-    const daysSince=w=> w? Math.max(0,(today-new Date(w+'T00:00:00'))/86400000) : 3650;
-    const seasonScore=r=> !r.season?0:(r.season===holiday?60:-1e6);   // out-of-season holiday recipes excluded
-    const score=r=> daysSince(lastWeek[r.id]) + seasonScore(r) + Math.random()*4;
-    let pool=recipes.filter(r=>!r.is_bread_centric && !r.disliked && !inWeek.has(r.id) && seasonScore(r)>-1000)
-                    .sort((a,b)=>score(b)-score(a));
-    const cnt={veg:0,fish:0,tomato:0,legume:0,freezer:0};
-    slots.forEach(s=>{ const r=s.recipes||{}; if(r.is_vegetarian)cnt.veg++; if(r.has_fish)cnt.fish++; if(r.has_tomato_sauce)cnt.tomato++; if(r.has_legume)cnt.legume++; if(r.freezer_ok)cnt.freezer++; });
-    const targetVeg=Math.ceil(dinners/2);
-    const breaksCap=r=> (r.has_fish&&cnt.fish>=1)||(r.has_tomato_sauce&&cnt.tomato>=1)||(r.has_legume&&cnt.legume>=1);
-    const picks=[];
-    while(picks.length<need){
-      const passes = (cnt.freezer===0)? ['freezer','veg','any'] : (cnt.veg<targetVeg? ['veg','any'] : ['any']);
-      let idx=-1;
-      for(const pass of passes){
-        idx=pool.findIndex(r=>!breaksCap(r) && (pass==='any' || (pass==='veg'&&r.is_vegetarian) || (pass==='freezer'&&r.freezer_ok)));
-        if(idx>=0) break;
+    // Try the LLM edge function; fall back to the local heuristic on any failure.
+    try{
+      const { data, error } = await sb.functions.invoke('suggest-week',
+        { body:{ plan_id:curPlan.id, dinners:curPlan.dinners, need, keep_recipe_ids: slots.map(s=>s.recipe_id) } });
+      if(!error && data && !data.fallback && (Array.isArray(data.picks)||Array.isArray(data.novel))){
+        const picks=(data.picks||[]).slice(0,need);
+        if(picks.length){ const base=slots.length;
+          await q(()=>sb.from('meal_plan_slots').insert(picks.map((id,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:+id, source:'suggested'})))); }
+        novelProposals=Array.isArray(data.novel)?data.novel:[]; renderNovel();
+        toast(picks.length? t('toast.suggested', picks.length) : t('toast.suggest_none'));
+        loadSlots(); return;
       }
-      if(idx<0) idx=pool.findIndex(r=>!breaksCap(r));
-      if(idx<0){ if(!pool.length) break; idx=0; }   // best-effort: fill even if a soft cap is exceeded
-      const r=pool.splice(idx,1)[0]; if(!r) break;
-      picks.push(r);
-      if(r.is_vegetarian)cnt.veg++; if(r.has_fish)cnt.fish++; if(r.has_tomato_sauce)cnt.tomato++; if(r.has_legume)cnt.legume++; if(r.freezer_ok)cnt.freezer++;
-    }
-    if(!picks.length){ toast(t('toast.suggest_none')); return; }
-    const base=slots.length;
-    await q(()=>sb.from('meal_plan_slots').insert(picks.map((r,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:r.id, source:'suggested'}))));
-    toast(t('toast.suggested', picks.length));
-    loadSlots();
+    }catch(e){ /* network / not deployed / no key -> heuristic */ }
+    await suggestWeekHeuristic(need);
   } finally { $('#suggestBtn').disabled=false; $('#suggestBtn').textContent=t('plan.suggest'); }
 }
+async function suggestWeekHeuristic(need){
+  const dinners=curPlan.dinners||0;
+  const hist=await q(()=>sb.from('meal_plan_slots').select('recipe_id,meal_plans(week_start)').neq('plan_id',curPlan.id));
+  const lastWeek={}; (hist.data||[]).forEach(h=>{ const w=h.meal_plans&&h.meal_plans.week_start; if(w && (!lastWeek[h.recipe_id]||w>lastWeek[h.recipe_id])) lastWeek[h.recipe_id]=w; });
+  const inWeek=new Set(slots.map(s=>s.recipe_id));
+  const holiday=currentHoliday(); const today=new Date();
+  const daysSince=w=> w? Math.max(0,(today-new Date(w+'T00:00:00'))/86400000) : 3650;
+  const seasonScore=r=> !r.season?0:(r.season===holiday?60:-1e6);   // out-of-season holiday recipes excluded
+  const score=r=> daysSince(lastWeek[r.id]) + seasonScore(r) + Math.random()*4;
+  let pool=recipes.filter(r=>!r.is_bread_centric && !r.disliked && !inWeek.has(r.id) && seasonScore(r)>-1000)
+                  .sort((a,b)=>score(b)-score(a));
+  const cnt={veg:0,fish:0,tomato:0,legume:0,freezer:0};
+  slots.forEach(s=>{ const r=s.recipes||{}; if(r.is_vegetarian)cnt.veg++; if(r.has_fish)cnt.fish++; if(r.has_tomato_sauce)cnt.tomato++; if(r.has_legume)cnt.legume++; if(r.freezer_ok)cnt.freezer++; });
+  const targetVeg=Math.ceil(dinners/2);
+  const breaksCap=r=> (r.has_fish&&cnt.fish>=1)||(r.has_tomato_sauce&&cnt.tomato>=1)||(r.has_legume&&cnt.legume>=1);
+  const picks=[];
+  while(picks.length<need){
+    const passes = (cnt.freezer===0)? ['freezer','veg','any'] : (cnt.veg<targetVeg? ['veg','any'] : ['any']);
+    let idx=-1;
+    for(const pass of passes){
+      idx=pool.findIndex(r=>!breaksCap(r) && (pass==='any' || (pass==='veg'&&r.is_vegetarian) || (pass==='freezer'&&r.freezer_ok)));
+      if(idx>=0) break;
+    }
+    if(idx<0) idx=pool.findIndex(r=>!breaksCap(r));
+    if(idx<0){ if(!pool.length) break; idx=0; }   // best-effort: fill even if a soft cap is exceeded
+    const r=pool.splice(idx,1)[0]; if(!r) break;
+    picks.push(r);
+    if(r.is_vegetarian)cnt.veg++; if(r.has_fish)cnt.fish++; if(r.has_tomato_sauce)cnt.tomato++; if(r.has_legume)cnt.legume++; if(r.freezer_ok)cnt.freezer++;
+  }
+  if(!picks.length){ toast(t('toast.suggest_none')); return; }
+  const base=slots.length;
+  await q(()=>sb.from('meal_plan_slots').insert(picks.map((r,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:r.id, source:'suggested'}))));
+  toast(t('toast.suggested', picks.length));
+  loadSlots();
+}
 $('#suggestBtn').addEventListener('click', suggestWeek);
+function renderNovel(){
+  const w=$('#novelWrap'); if(!w) return;
+  if(!novelProposals.length){ w.innerHTML=''; return; }
+  w.innerHTML=`<h2 style="margin-top:18px">${t('plan.novel_title')}</h2>`+
+    `<ul class="list">`+novelProposals.map((n,i)=>`<li><div style="padding:12px 15px">
+      <div class="row-title">${esc(n.name||'')}</div>
+      <div class="row-sub" style="margin-top:5px">${tagHtml(n)}</div>
+      ${Array.isArray(n.ingredients)&&n.ingredients.length?`<div class="muted" style="font-size:.78rem;margin-top:6px">${n.ingredients.map(x=>esc(String(x))).join(' · ')}</div>`:''}
+      <div class="formbtns" style="margin-top:8px"><button class="addbtn" data-nlib="${i}">${t('novel.add_library')}</button><button class="addbtn" data-nweek="${i}">${t('novel.add_week')}</button></div>
+    </div></li>`).join('')+`</ul>`;
+}
+$('#novelWrap').addEventListener('click',async e=>{
+  const el=e.target.closest('[data-nlib],[data-nweek]'); if(!el) return;
+  const toWeek=el.dataset.nweek!=null; const i=+(el.dataset.nlib!=null?el.dataset.nlib:el.dataset.nweek);
+  const n=novelProposals[i]; if(!n) return;
+  el.disabled=true;
+  const rid=await addNovelToLibrary(n);
+  if(rid && toWeek) await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:rid, source:'suggested'}));
+  novelProposals.splice(i,1); renderNovel(); toast(t('toast.novel_added'));
+  loadRecipes(); loadSlots();
+});
+async function addNovelToLibrary(n){
+  const rec={ name:(n.name||'').trim()||'Uusi resepti', is_vegetarian:!!n.is_vegetarian, has_fish:!!n.has_fish,
+    has_legume:!!n.has_legume, has_tomato_sauce:!!n.has_tomato_sauce, freezer_ok:!!n.freezer_ok,
+    is_bread_centric:!!n.is_bread_centric, effort:n.effort||'normal', season:n.season||null, source:'suggested', on_trial:true };
+  const ins=await q(()=>sb.from('recipes').insert(rec).select().single());
+  const rid=ins.data&&ins.data.id; if(!rid) return null;
+  const lines=(Array.isArray(n.ingredients)?n.ingredients:[]).map(l=>String(l).trim()).filter(Boolean);
+  if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>{
+    const opt=l.startsWith('?'); const text=opt? l.replace(/^\?\s*/,'') : l;
+    return {recipe_id:rid, line_text:text, ingredient_key:normKey(text), qty:parseQty(text), unit:parseUnit(text), is_optional:opt};
+  })));
+  return rid;
+}
 function tagsOf(r){ const arr=[]; if(r.is_vegetarian)arr.push(t('tag.veg')); if(r.has_fish)arr.push(t('tag.fish')); if(r.has_legume)arr.push(t('tag.legume')); if(r.has_tomato_sauce)arr.push(t('tag.tomato')); if(r.freezer_ok)arr.push(t('tag.freezer')); if(r.is_bread_centric)arr.push(t('tag.bread')); if(r.batch>1)arr.push(t('tag.batch', r.batch)); if(r.effort&&r.effort!=='normal')arr.push(t('effort.'+r.effort)); if(r.season)arr.push(t('season.'+r.season)); return arr; }
 function tagHtml(r){ const tg=tagsOf(r); return tg.length? tg.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">'+t('tags.no_tags')+'</span>'; }
 function renderRecipes(){
