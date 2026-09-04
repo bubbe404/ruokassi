@@ -583,6 +583,7 @@ async function loadRecipes(){
 async function loadSlots(){
   const { data } = await q(()=>sb.from('meal_plan_slots').select('id,recipe_id,recipes(*)').eq('plan_id',curPlan.id).order('slot'));
   slots=data||[]; renderMenu(); renderRules();
+  loadMenuSection();   // keep the Basket's "this week's menu" in sync with plan changes
 }
 function tagsOf(r){ const arr=[]; if(r.is_vegetarian)arr.push(t('tag.veg')); if(r.has_fish)arr.push(t('tag.fish')); if(r.has_legume)arr.push(t('tag.legume')); if(r.has_tomato_sauce)arr.push(t('tag.tomato')); if(r.freezer_ok)arr.push(t('tag.freezer')); if(r.is_bread_centric)arr.push(t('tag.bread')); if(r.batch>1)arr.push(t('tag.batch', r.batch)); if(r.effort&&r.effort!=='normal')arr.push(t('effort.'+r.effort)); if(r.season)arr.push(t('season.'+r.season)); return arr; }
 function tagHtml(r){ const tg=tagsOf(r); return tg.length? tg.map(x=>`<span class="tg">${x}</span>`).join(' ') : '<span class="muted" style="font-size:.72rem">'+t('tags.no_tags')+'</span>'; }
