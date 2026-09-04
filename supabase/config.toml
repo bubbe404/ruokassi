@@ -1,0 +1,8 @@
+# Supabase project config (ruokassi). Declares edge-function auth so it is
+# versioned, not just "remembered" in the dashboard (Fable review S7/C5).
+project_id = "nzpkmtwmdruqcsussxgr"
+
+[functions.suggest-week]
+# Require a valid Supabase JWT on the LLM suggestion endpoint so only signed-in
+# users (the two household accounts) can spend Anthropic credits.
+verify_jwt = true

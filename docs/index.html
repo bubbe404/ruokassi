@@ -223,7 +223,7 @@
       <p class="hint" data-i18n="due.hint">Perustuotteet, joita on ostettu ≥25 %:ssa tilauksista ja jotka ovat nyt yli tavallisen väliajan. Ehdotettu määrä on mediaanisi.</p>
     </section>
 
-    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-05-k</div>
+    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:22px 0 6px">ruokassi · build 2026-09-05-l</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -258,6 +258,9 @@ async function q(fn){
   }
   return r;
 }
+// write wrapper: surface DB failures instead of showing a false success toast.
+function toastErr(e){ const m=(e&&(e.message||e.error))||e||'virhe'; toast('⚠ '+m); }
+async function w(fn){ const r=await q(fn); if(r&&r.error){ toastErr(r.error); throw new Error((r.error&&r.error.message)||'write failed'); } return r; }
 
 async function boot(){
   applyStaticI18n(); var _ls=document.querySelector('#langSel'); if(_ls){ _ls.value=LANG; _ls.addEventListener('change',function(e){setLang(e.target.value);}); }
@@ -381,10 +384,10 @@ $('#basketList').addEventListener('click', async e=>{
   if(tgt.dataset.chk!=null){ const i=+tgt.dataset.chk; basket[i].checked=!basket[i].checked; renderBasket(); }
   else if(tgt.dataset.inc!=null){ const i=+tgt.dataset.inc; basket[i].default_qty=round1(basket[i].default_qty+1); renderBasket(); saveQty(basket[i]); }
   else if(tgt.dataset.dec!=null){ const i=+tgt.dataset.dec; basket[i].default_qty=Math.max(0,round1(basket[i].default_qty-1)); renderBasket(); saveQty(basket[i]); }
-  else if(tgt.dataset.rm!=null){ const b=basket[+tgt.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast(t('toast.removed', cap(b.name))); loadBasket(); }
+  else if(tgt.dataset.rm!=null){ const b=basket[+tgt.dataset.rm]; await w(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast(t('toast.removed', cap(b.name))); loadBasket(); }
 });
 const round1=x=>Math.round(x*10)/10;
-async function saveQty(b){ await q(()=>sb.from('standard_basket').update({default_qty:b.default_qty}).eq('product_id',b.product_id)); }
+async function saveQty(b){ await w(()=>sb.from('standard_basket').update({default_qty:b.default_qty}).eq('product_id',b.product_id)); }
 
 async function loadSuggestions(inIds){
   const { data } = await q(()=>sb.from('product_frequency')
@@ -399,7 +402,7 @@ async function loadSuggestions(inIds){
       <button class="addbtn" data-add="${s.product_id}" data-q="${s.median_qty}">${t('sug.add')}</button>
     </div></li>`).join('')+`</ul>`;
   $('#sugWrap').querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',async()=>{
-    await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:Math.max(1,Math.round(Number(btn.dataset.q)||1)), added_by:ME}));
+    await w(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.add, default_qty:Math.max(1,Math.round(Number(btn.dataset.q)||1)), added_by:ME}));
     toast(t('toast.added_basket')); loadBasket();
   }));
 }
@@ -420,7 +423,7 @@ $('#addSearch').addEventListener('input', e=>{
       <span class="row-title">${esc(term)}</span>
       <button class="addbtn" data-newbasket="${esc(term)}">${t('basket.add_new')}</button></li>`;
     $('#addResults').querySelectorAll('[data-padd]').forEach(btn=>btn.addEventListener('click',async()=>{
-      await q(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1, added_by:ME}));
+      await w(()=>sb.from('standard_basket').insert({product_id:+btn.dataset.padd, default_qty:1, added_by:ME}));
       $('#addSearch').value=''; $('#addResults').innerHTML=''; toast(t('toast.added_basket')); loadBasket();
     }));
     const nb=$('#addResults').querySelector('[data-newbasket]');
@@ -431,9 +434,9 @@ $('#addSearch').addEventListener('input', e=>{
   },250);
 });
 async function addFreeItemToBasket(name){
-  const up=await q(()=>sb.from('products').upsert({name:name},{onConflict:'name'}).select('id').single());
+  const up=await w(()=>sb.from('products').upsert({name:name},{onConflict:'name'}).select('id').single());
   const pid=up.data && up.data.id; if(!pid) return;
-  await q(()=>sb.from('standard_basket').upsert({product_id:pid, default_qty:1, added_by:ME},{onConflict:'product_id'}));
+  await w(()=>sb.from('standard_basket').upsert({product_id:pid, default_qty:1, added_by:ME},{onConflict:'product_id'}));
 }
 
 $('#copyBtn').addEventListener('click',()=>{
@@ -635,20 +638,20 @@ $('#menuWrap').addEventListener('input',e=>{
   },250);
 });
 async function resolveKey(key, pid){
-  await q(()=>sb.from('ingredient_product_map').upsert({ingredient_key:key, product_id:pid, last_used_at:new Date().toISOString()},{onConflict:'ingredient_key'}));
-  await q(()=>sb.from('recipe_ingredients').update({product_id:pid}).eq('ingredient_key',key).is('product_id',null));
+  await w(()=>sb.from('ingredient_product_map').upsert({ingredient_key:key, product_id:pid, last_used_at:new Date().toISOString()},{onConflict:'ingredient_key'}));
+  await w(()=>sb.from('recipe_ingredients').update({product_id:pid}).eq('ingredient_key',key).is('product_id',null));
   toast(t('toast.matched')); loadMenuSection();
 }
 // create a product that was never bought before (stored uppercase, matching receipt convention)
 async function addNewProduct(name){
   name=(name||'').trim(); if(!name) return null;
-  const r=await q(()=>sb.from('products').upsert({name:name.toUpperCase()},{onConflict:'name'}).select('id').single());
+  const r=await w(()=>sb.from('products').upsert({name:name.toUpperCase()},{onConflict:'name'}).select('id').single());
   return r&&r.data ? r.data.id : null;
 }
 // optional ingredients: per-week only, never written back to the recipe
 async function setOptional(ingId, state, pid){
   if(!menuPlanId) return;
-  await q(()=>sb.from('meal_plan_optionals').upsert(
+  await w(()=>sb.from('meal_plan_optionals').upsert(
     {plan_id:menuPlanId, recipe_ingredient_id:ingId, state, product_id:pid, updated_at:new Date().toISOString()},
     {onConflict:'plan_id,recipe_ingredient_id'}));
   toast(t(state==='chosen'?'toast.opt_chosen':'toast.opt_removed')); loadMenuSection();
@@ -656,7 +659,7 @@ async function setOptional(ingId, state, pid){
 function chooseOptional(ingId, pid){ setOptional(ingId, 'chosen', pid); }
 async function clearOptional(ingId){
   if(!menuPlanId) return;
-  await q(()=>sb.from('meal_plan_optionals').delete().eq('plan_id',menuPlanId).eq('recipe_ingredient_id',ingId));
+  await w(()=>sb.from('meal_plan_optionals').delete().eq('plan_id',menuPlanId).eq('recipe_ingredient_id',ingId));
   toast(t('toast.opt_restored')); loadMenuSection();
 }
 
@@ -668,16 +671,22 @@ function fail(sel,err){ const el=$(sel); if(el) el.innerHTML=`<li class="empty" 
 let curPlan=null, recipes=[], slots=[];
 const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const capH=s=>esc(cap(s));   // HTML-safe capitalize (use in innerHTML; plain cap() for toasts/clipboard)
-function monday(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off); return d.toISOString().slice(0,10); }
+function monday(){ const d=new Date(); const off=(d.getDay()+6)%7; d.setDate(d.getDate()-off);
+  // build from LOCAL parts — toISOString() would shift to UTC and pick the wrong day early Monday
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function normKey(l){ return (l||'').toLowerCase().replace(/^[\s\d.,/-]+/,'').replace(/^(g|kg|dl|l|ml|kpl|tl|rkl|prk|ps|pkt|ras|pkl)\b\.?\s*/,'').trim().split(/\s+/).slice(0,2).join(' '); }
 function parseQty(l){ const m=(l||'').match(/^\s*([\d.,]+)/); return m? Number(m[1].replace(',','.')) : null; }
 function parseUnit(l){ const m=(l||'').match(/^\s*[\d.,]+\s*(kg|g|dl|ml|l|kpl|tl|rkl|prk|pkt|ras|pss|tlk|ps)\b/i); return m? m[1].toLowerCase() : null; }
 
 async function loadPlan(){
   const ws=monday();
-  const got=await q(()=>sb.from('meal_plans').select('*').eq('week_start',ws).limit(1));
-  if(got.data && got.data.length) curPlan=got.data[0];
-  else { const ins=await q(()=>sb.from('meal_plans').insert({week_start:ws,dinners:5}).select().single()); curPlan=ins.data; }
+  let got=await q(()=>sb.from('meal_plans').select('*').eq('week_start',ws).limit(1));
+  if(!(got.data && got.data.length)){
+    // race-safe get-or-create: unique(week_start) + upsert-ignore, then re-select
+    await w(()=>sb.from('meal_plans').upsert({week_start:ws,dinners:5},{onConflict:'week_start',ignoreDuplicates:true}));
+    got=await q(()=>sb.from('meal_plans').select('*').eq('week_start',ws).limit(1));
+  }
+  curPlan=got.data && got.data[0];
   if(!curPlan) return;
   $('#weekLabel').textContent=t('plan.week_label', fmtDate(ws));
   $('#dinN').textContent=curPlan.dinners; $('#lunch').checked=!!curPlan.lunches; $('#planNote').value=curPlan.note||'';
@@ -701,15 +710,16 @@ async function loadTrials(){
 }
 $('#trialWrap').addEventListener('click',async e=>{
   const k=e.target.closest('[data-tkeep]'); const d=e.target.closest('[data-tdrop]');
-  if(k){ await q(()=>sb.from('recipes').update({on_trial:false, keep:true}).eq('id',+k.dataset.tkeep)); toast(t('toast.trial_kept')); loadTrials(); loadRecipes(); return; }
-  if(d){ await q(()=>sb.from('recipes').update({on_trial:false, keep:false, disliked:true}).eq('id',+d.dataset.tdrop)); toast(t('toast.trial_dropped')); loadTrials(); loadRecipes(); }
+  if(k){ await w(()=>sb.from('recipes').update({on_trial:false, keep:true}).eq('id',+k.dataset.tkeep)); toast(t('toast.trial_kept')); loadTrials(); loadRecipes(); return; }
+  if(d){ await w(()=>sb.from('recipes').update({on_trial:false, keep:false, disliked:true}).eq('id',+d.dataset.tdrop)); toast(t('toast.trial_dropped')); loadTrials(); loadRecipes(); }
 });
 async function loadRecipes(){
   const { data } = await q(()=>sb.from('recipes').select('*').order('name'));
   recipes=data||[]; $('#recCount').textContent=recipes.length; renderRecipes();
 }
+function nextSlot(){ return slots.reduce((m,s)=>Math.max(m, s.slot||0), 0) + 1; }  // max+1, so numbers don't collide after a delete
 async function loadSlots(){
-  const { data } = await q(()=>sb.from('meal_plan_slots').select('id,recipe_id,recipes(*)').eq('plan_id',curPlan.id).order('slot'));
+  const { data } = await q(()=>sb.from('meal_plan_slots').select('id,slot,recipe_id,recipes(*)').eq('plan_id',curPlan.id).order('slot'));
   slots=data||[]; renderMenu(); renderRules();
   loadMenuSection();   // keep the Basket's "this week's menu" in sync with plan changes
 }
@@ -734,8 +744,8 @@ async function suggestWeek(){
         { body:{ plan_id:curPlan.id, dinners:curPlan.dinners, need, keep_recipe_ids: slots.map(s=>s.recipe_id) } });
       if(!error && data && !data.fallback && (Array.isArray(data.picks)||Array.isArray(data.novel))){
         const picks=(data.picks||[]).slice(0,need);
-        if(picks.length){ const base=slots.length;
-          await q(()=>sb.from('meal_plan_slots').insert(picks.map((id,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:+id, source:'suggested'})))); }
+        if(picks.length){ const base=nextSlot()-1;
+          await w(()=>sb.from('meal_plan_slots').insert(picks.map((id,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:+id, source:'suggested'})))); }
         novelProposals=Array.isArray(data.novel)?data.novel:[]; renderNovel();
         toast(picks.length? t('toast.suggested', picks.length) : t('toast.suggest_none'));
         loadSlots(); return;
@@ -774,8 +784,8 @@ async function suggestWeekHeuristic(need){
     if(r.is_vegetarian)cnt.veg++; if(r.has_fish)cnt.fish++; if(r.has_tomato_sauce)cnt.tomato++; if(r.has_legume)cnt.legume++; if(r.freezer_ok)cnt.freezer++;
   }
   if(!picks.length){ toast(t('toast.suggest_none')); return; }
-  const base=slots.length;
-  await q(()=>sb.from('meal_plan_slots').insert(picks.map((r,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:r.id, source:'suggested'}))));
+  const base=nextSlot()-1;
+  await w(()=>sb.from('meal_plan_slots').insert(picks.map((r,i)=>({plan_id:curPlan.id, slot:base+i+1, recipe_id:r.id, source:'suggested'}))));
   toast(t('toast.suggested', picks.length));
   loadSlots();
 }
@@ -797,7 +807,7 @@ $('#novelWrap').addEventListener('click',async e=>{
   const n=novelProposals[i]; if(!n) return;
   el.disabled=true;
   const rid=await addNovelToLibrary(n);
-  if(rid && toWeek) await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:rid, source:'suggested'}));
+  if(rid && toWeek) await w(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:nextSlot(), recipe_id:rid, source:'suggested'}));
   novelProposals.splice(i,1); renderNovel(); toast(t('toast.novel_added'));
   loadRecipes(); loadSlots();
 });
@@ -808,10 +818,10 @@ async function addNovelToLibrary(n){
   const rec={ name:(n.name||'').trim().slice(0,120)||'Uusi resepti', is_vegetarian:!!n.is_vegetarian, has_fish:!!n.has_fish,
     has_legume:!!n.has_legume, has_tomato_sauce:!!n.has_tomato_sauce, freezer_ok:!!n.freezer_ok,
     is_bread_centric:!!n.is_bread_centric, effort, season, source:'suggested', on_trial:true };
-  const ins=await q(()=>sb.from('recipes').insert(rec).select().single());
+  const ins=await w(()=>sb.from('recipes').insert(rec).select().single());
   const rid=ins.data&&ins.data.id; if(!rid) return null;
   const lines=(Array.isArray(n.ingredients)?n.ingredients:[]).map(l=>String(l).trim()).filter(Boolean);
-  if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>{
+  if(lines.length) await w(()=>sb.from('recipe_ingredients').insert(lines.map(l=>{
     const opt=l.startsWith('?'); const text=opt? l.replace(/^\?\s*/,'') : l;
     return {recipe_id:rid, line_text:text, ingredient_key:normKey(text), qty:parseQty(text), unit:parseUnit(text), is_optional:opt};
   })));
@@ -850,18 +860,18 @@ function rchip(ok,label){ return `<span class="rchip ${ok?'ok':'no'}">${ok?'✓'
 
 $('#dinInc').addEventListener('click',()=>setDinners(curPlan.dinners+1));
 $('#dinDec').addEventListener('click',()=>setDinners(Math.max(1,curPlan.dinners-1)));
-async function setDinners(v){ curPlan.dinners=v; $('#dinN').textContent=v; renderMenu(); await q(()=>sb.from('meal_plans').update({dinners:v}).eq('id',curPlan.id)); }
+async function setDinners(v){ curPlan.dinners=v; $('#dinN').textContent=v; renderMenu(); await w(()=>sb.from('meal_plans').update({dinners:v}).eq('id',curPlan.id)); }
 $('#lunch').addEventListener('change',async e=>{ curPlan.lunches=e.target.checked; await q(()=>sb.from('meal_plans').update({lunches:e.target.checked}).eq('id',curPlan.id)); });
 let noteT; $('#planNote').addEventListener('input',e=>{ clearTimeout(noteT); const v=e.target.value; noteT=setTimeout(()=>q(()=>sb.from('meal_plans').update({note:v}).eq('id',curPlan.id)),700); });
 
 $('#recipeList').addEventListener('click',async e=>{
   const tgt=e.target.closest('[data-week],[data-edit]'); if(!tgt) return;
-  if(tgt.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+tgt.dataset.week})); toast(t('toast.added_menu')); loadSlots(); }
+  if(tgt.dataset.week!=null){ await w(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:nextSlot(), recipe_id:+tgt.dataset.week})); toast(t('toast.added_menu')); loadSlots(); }
   else openRecipeForm(recipes.find(r=>r.id==tgt.dataset.edit));
 });
 $('#menuList').addEventListener('click',async e=>{
   const tgt=e.target.closest('[data-slot]'); if(!tgt) return;
-  await q(()=>sb.from('meal_plan_slots').delete().eq('id',+tgt.dataset.slot)); loadSlots();
+  await w(()=>sb.from('meal_plan_slots').delete().eq('id',+tgt.dataset.slot)); loadSlots();
 });
 
 $('#newRecipeBtn').addEventListener('click',()=>openRecipeForm(null));
@@ -893,12 +903,12 @@ async function saveRecipe(id){
     has_tomato_sauce:$('#rfTom').checked, freezer_ok:$('#rfFreez').checked, is_bread_centric:$('#rfBread').checked,
     effort:$('#rfEffort').value, season:$('#rfSeason').value||null, batch:Number($('#rfBatch').value)||1 };
   let rid=id;
-  if(id) await q(()=>sb.from('recipes').update(rec).eq('id',id));
-  else { const ins=await q(()=>sb.from('recipes').insert(rec).select().single()); rid=ins.data&&ins.data.id; }
+  if(id) await w(()=>sb.from('recipes').update(rec).eq('id',id));
+  else { const ins=await w(()=>sb.from('recipes').insert(rec).select().single()); rid=ins.data&&ins.data.id; }
   if(rid){
-    await q(()=>sb.from('recipe_ingredients').delete().eq('recipe_id',rid));
+    await w(()=>sb.from('recipe_ingredients').delete().eq('recipe_id',rid));
     const lines=$('#rfIng').value.split('\n').map(l=>l.trim()).filter(Boolean);
-    if(lines.length) await q(()=>sb.from('recipe_ingredients').insert(lines.map(l=>{
+    if(lines.length) await w(()=>sb.from('recipe_ingredients').insert(lines.map(l=>{
       const opt=l.startsWith('?'); const text=opt? l.replace(/^\?\s*/,'') : l;
       return {recipe_id:rid, line_text:text, ingredient_key:normKey(text), qty:parseQty(text), unit:parseUnit(text), is_optional:opt};
     })));
