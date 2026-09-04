@@ -19,7 +19,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 FEE_KEYS = ("PAKKAUSMATERIAALIMAKSU", "KERAILYMAKSU", "KERÄILYMAKSU",
-            "TOIMITUSMAKSU", "PALVELUMAKSU")
+            "TOIMITUSMAKSU", "PALVELUMAKSU", "NOUTO")
 
 item_re   = re.compile(r'^(.+?)\s{2,}(\d+,\d{2})$')
 qty_re    = re.compile(r'^([\d,]+)\s*(KPL|KG)\s+([\d,]+)\s*€/(KPL|KG)$')
