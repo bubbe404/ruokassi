@@ -50,11 +50,20 @@ class Supa:
         if found:
             pid = found[0]['product_id']
         else:
-            prod = self._post('products', {'name': raw_name},
+            # on_conflict=name makes this an UPSERT: a pre-existing name returns
+            # the existing row instead of raising a 409 unique-violation (which
+            # would abort the whole run). Reached whenever a product exists with
+            # no alias yet — e.g. one the app created via "add as new" / a free
+            # basket item, then later seen on a receipt.
+            prod = self._post('products?on_conflict=name', {'name': raw_name},
                               prefer='return=representation,resolution=merge-duplicates')
-            # on_conflict on name -> either the new row or the existing one
             if isinstance(prod, list):
-                prod = prod[0]
+                prod = prod[0] if prod else None
+            if not prod:  # representation empty for some reason: fetch by name
+                rows = self._get('products', {'name': f'eq.{raw_name}', 'select': 'id'})
+                prod = rows[0] if rows else None
+            if not prod:
+                raise RuntimeError(f'could not get-or-create product {raw_name!r}')
             pid = prod['id']
             # bind the alias (ignore if it already exists)
             try:

@@ -146,11 +146,27 @@ def run(args):
                 f'total={p["order_total_eur"]} net-basket={p["sum_net_eur"]-p["order_discount_eur"]}')
 
         if not dry:
-            supa.upsert_order(p, source_message_id=mid)
-            supa.record_email(mid, p['subject'], recv_iso, p['receipt_type'],
-                              p['order_id'], raw.decode('utf-8', 'replace'), True)
-            if p['missing_items']:
-                new_missing.append(p)
+            # Isolate DB writes per message: one failing order must not abort the
+            # whole run (and leave every later receipt unprocessed). On failure we
+            # log it and leave the email un-acked (parsed_ok=False) so the next run
+            # retries it — upsert_order is idempotent, so a retry is safe.
+            try:
+                supa.upsert_order(p, source_message_id=mid)
+                supa.record_email(mid, p['subject'], recv_iso, p['receipt_type'],
+                                  p['order_id'], raw.decode('utf-8', 'replace'), True)
+                if p['missing_items']:
+                    new_missing.append(p)
+            except Exception as e:
+                n_fail += 1
+                failures.append((mid, f'db write failed: {e}'))
+                log(f'[error] {p.get("order_id", "?")} db write failed: {e}')
+                try:
+                    supa.record_email(mid, p.get('subject'), recv_iso, p.get('receipt_type'),
+                                      p.get('order_id'), raw.decode('utf-8', 'replace'),
+                                      False, f'db write failed: {e}')
+                except Exception:
+                    pass
+                continue
 
     log(f'[done] ingested_ok={n_ok} not_reconciled={n_bad} '
         f'skipped_dupes={n_skip} parse_failures={n_fail}')
