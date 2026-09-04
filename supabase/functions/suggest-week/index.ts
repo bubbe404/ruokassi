@@ -13,7 +13,9 @@ const cors = {
 const SB_URL = Deno.env.get("SUPABASE_URL")!;
 const SRK = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const AK = Deno.env.get("ANTHROPIC_API_KEY") || "";
-const MODEL = Deno.env.get("SUGGEST_MODEL") || "claude-3-5-sonnet-20241022";
+// Current models (2026); override/reorder via SUGGEST_MODEL="id1,id2". Tries each, skipping 404s.
+const MODELS = (Deno.env.get("SUGGEST_MODEL") || "claude-haiku-4-5-20251001,claude-sonnet-5,claude-opus-5")
+  .split(",").map((s) => s.trim()).filter(Boolean);
 
 function json(o: unknown, status = 200) {
   return new Response(JSON.stringify(o), { status, headers: { ...cors, "content-type": "application/json" } });
@@ -59,22 +61,33 @@ Respond with ONLY minified JSON, no prose, exactly this shape:
 {"picks":[library recipe ids to add, length ${p.need}],"novel":[{"name":"","is_vegetarian":true,"has_fish":false,"has_legume":false,"has_tomato_sauce":false,"freezer_ok":false,"is_bread_centric":false,"effort":"normal","season":null,"ingredients":["määrä + aine"]}],"note":"one short sentence in Finnish"}
 Prefer filling "picks" from the library. Optionally add up to 3 novel recipe ideas in "novel" that fit the rules/season and add variety (ingredient lines in Finnish: amount + item). If the library cannot satisfy the rules, lean on novel and return fewer picks. The whole response must be valid JSON.`;
 }
-async function callAnthropic(prompt: string) {
+async function anthropicOnce(model: string, prompt: string) {
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "x-api-key": AK, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
+    body: JSON.stringify({ model, max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
   });
-  if (!r.ok) throw new Error("anthropic " + r.status + " " + (await r.text()).slice(0, 300));
-  const d = await r.json();
+  const bodyText = await r.text();
+  if (r.status === 404) { const e: any = new Error("model_not_found " + model); e.notFound = true; throw e; }
+  if (!r.ok) throw new Error("anthropic " + r.status + " " + bodyText.slice(0, 300));
+  const d = JSON.parse(bodyText);
   const text = (d.content || []).map((c: any) => c.text || "").join("").trim();
-  return JSON.parse(stripFences(text));
+  return { ai: JSON.parse(stripFences(text)), model };
+}
+async function callAnthropic(prompt: string) {
+  let lastErr: any;
+  for (const m of MODELS) {
+    try { const res = await anthropicOnce(m, prompt); console.log("suggest-week used model=" + m); return res; }
+    catch (e: any) { if (e && e.notFound) { console.log("suggest-week model 404 " + m); lastErr = e; continue; } throw e; }
+  }
+  throw lastErr || new Error("no model available");
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   try {
-    if (!AK) return json({ error: "no_key", fallback: true });
+    console.log(`suggest-week start hasKey=${!!AK} keyLen=${AK.length} models=${MODELS.join("/")}`);
+    if (!AK) { console.log("suggest-week no_key"); return json({ error: "no_key", fallback: true }); }
     const body = await req.json().catch(() => ({}));
     const dinners = Number(body.dinners) || 5;
     const need = Math.max(1, Number(body.need) || dinners);
@@ -96,12 +109,14 @@ Deno.serve(async (req) => {
     if (!lib.length) return json({ error: "empty_library", fallback: true });
 
     const today = new Date().toISOString().slice(0, 10);
-    const ai = await callAnthropic(buildPrompt({ dinners, need, keepIds, lib, today }));
+    const { ai, model: usedModel } = await callAnthropic(buildPrompt({ dinners, need, keepIds, lib, today }));
     const libIds = new Set(lib.map((l: any) => l.id));
     const picks = (ai.picks || []).map(Number).filter((id: number) => libIds.has(id)).slice(0, need);
     const novel = (Array.isArray(ai.novel) ? ai.novel : []).slice(0, 3);
-    return json({ picks, novel, note: typeof ai.note === "string" ? ai.note : "", model: MODEL });
+    console.log(`suggest-week ok picks=${picks.length} novel=${novel.length} model=${usedModel}`);
+    return json({ picks, novel, note: typeof ai.note === "string" ? ai.note : "", model: usedModel });
   } catch (e) {
+    console.log("suggest-week fail: " + String(e));
     return json({ error: String(e), fallback: true });
   }
 });
