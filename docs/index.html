@@ -371,11 +371,11 @@ function renderBasket(){
     </div></li>`).join('');
 }
 $('#basketList').addEventListener('click', async e=>{
-  const t=e.target.closest('[data-chk],[data-inc],[data-dec],[data-rm]'); if(!t) return;
-  if(t.dataset.chk!=null){ const i=+t.dataset.chk; basket[i].checked=!basket[i].checked; renderBasket(); }
-  else if(t.dataset.inc!=null){ const i=+t.dataset.inc; basket[i].default_qty=round1(basket[i].default_qty+1); renderBasket(); saveQty(basket[i]); }
-  else if(t.dataset.dec!=null){ const i=+t.dataset.dec; basket[i].default_qty=Math.max(0,round1(basket[i].default_qty-1)); renderBasket(); saveQty(basket[i]); }
-  else if(t.dataset.rm!=null){ const b=basket[+t.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast(t('toast.removed', cap(b.name))); loadBasket(); }
+  const tgt=e.target.closest('[data-chk],[data-inc],[data-dec],[data-rm]'); if(!tgt) return;
+  if(tgt.dataset.chk!=null){ const i=+tgt.dataset.chk; basket[i].checked=!basket[i].checked; renderBasket(); }
+  else if(tgt.dataset.inc!=null){ const i=+tgt.dataset.inc; basket[i].default_qty=round1(basket[i].default_qty+1); renderBasket(); saveQty(basket[i]); }
+  else if(tgt.dataset.dec!=null){ const i=+tgt.dataset.dec; basket[i].default_qty=Math.max(0,round1(basket[i].default_qty-1)); renderBasket(); saveQty(basket[i]); }
+  else if(tgt.dataset.rm!=null){ const b=basket[+tgt.dataset.rm]; await q(()=>sb.from('standard_basket').delete().eq('product_id',b.product_id)); toast(t('toast.removed', cap(b.name))); loadBasket(); }
 });
 const round1=x=>Math.round(x*10)/10;
 async function saveQty(b){ await q(()=>sb.from('standard_basket').update({default_qty:b.default_qty}).eq('product_id',b.product_id)); }
@@ -467,8 +467,8 @@ function renderMissingSection(){
       <div class="qty">×${trimQty(m.qty)}</div></div></li>`).join('')+`</ul>`;
 }
 $('#missWrap').addEventListener('click',e=>{
-  const t=e.target.closest('[data-mchk]'); if(!t) return;
-  const i=+t.dataset.mchk; missWeek[i].checked=!missWeek[i].checked; renderMissingSection();
+  const tgt=e.target.closest('[data-mchk]'); if(!tgt) return;
+  const i=+tgt.dataset.mchk; missWeek[i].checked=!missWeek[i].checked; renderMissingSection();
 });
 
 // ---------- MENU → basket (Phase 3) ----------
@@ -622,13 +622,13 @@ $('#lunch').addEventListener('change',async e=>{ curPlan.lunches=e.target.checke
 let noteT; $('#planNote').addEventListener('input',e=>{ clearTimeout(noteT); const v=e.target.value; noteT=setTimeout(()=>q(()=>sb.from('meal_plans').update({note:v}).eq('id',curPlan.id)),700); });
 
 $('#recipeList').addEventListener('click',async e=>{
-  const t=e.target.closest('[data-week],[data-edit]'); if(!t) return;
-  if(t.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+t.dataset.week})); toast(t('toast.added_menu')); loadSlots(); }
-  else openRecipeForm(recipes.find(r=>r.id==t.dataset.edit));
+  const tgt=e.target.closest('[data-week],[data-edit]'); if(!tgt) return;
+  if(tgt.dataset.week!=null){ await q(()=>sb.from('meal_plan_slots').insert({plan_id:curPlan.id, slot:slots.length+1, recipe_id:+tgt.dataset.week})); toast(t('toast.added_menu')); loadSlots(); }
+  else openRecipeForm(recipes.find(r=>r.id==tgt.dataset.edit));
 });
 $('#menuList').addEventListener('click',async e=>{
-  const t=e.target.closest('[data-slot]'); if(!t) return;
-  await q(()=>sb.from('meal_plan_slots').delete().eq('id',+t.dataset.slot)); loadSlots();
+  const tgt=e.target.closest('[data-slot]'); if(!tgt) return;
+  await q(()=>sb.from('meal_plan_slots').delete().eq('id',+tgt.dataset.slot)); loadSlots();
 });
 
 $('#newRecipeBtn').addEventListener('click',()=>openRecipeForm(null));
