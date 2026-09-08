@@ -95,6 +95,22 @@ Goal: place the order on s‑kaupat.fi from the basket. No API → **browser aut
 
 ---
 
+## Added 2026‑09‑08 — M's requests
+
+Five items from M, with suggested milestone placement:
+
+1. **Suggest 7 recipe alternatives, not 3.** The edge function caps novel ideas at 3 (`novel.slice(0,3)` in `cleanNovel`, and "up to 3" in the prompt). Raise to 7 — bump the slice, update the prompt wording, and confirm `max_tokens` (now 2000) is enough for 7 ideas with steps. Client `renderNovel` already loops over whatever it's given. → **M6** (extends the suggestions work just shipped).
+
+2. **Trim the basket hint copy.** `basket.hint` ends with "Painon mukaan myytäviä ei voi laskea automaattisesti, joten ne alkavat pieninä — aseta kerran ja ne pysyvät." Per a code read on 2026‑09‑08 this is still *technically* accurate (quantities are stored as whole pieces in `standard_basket.default_qty` and reused; there is no automatic kg→piece conversion), but the sentence is long and confusing. Shorten the hint and drop this clause. Confirm with M whether behaviour changed before deciding it's outright false. → **M8** (copy/polish) or a quick standalone fix.
+
+3. **Group the basket into store sub-categories.** Section the weekly basket under S‑kaupat's own headings, in this order: HEDELMÄT JA VIHANNEKSET · HILLOT JA SÄILYKKEET · JUOMAT · KAHVIT, TEET JA MEHUT · KODINHOITO JA TALOUSTARVIKKEET · KUIVATUOTTEET JA LEIVONTA · LEIVÄT JA LEIVONNAISET · LIHA JA KASVIPROTEIINIT · MAITO, MUNAT JA RASVAT · PAKASTEET · PASTAT, RIISIT JA NUUDELIT · SNACKSIT · MUUT. Needs a `category` on `products` (nullable, default → MUUT), a way to assign it (manual edit now; ideally auto-classified from S‑kaupat's own category on the receipt during ingest, or a one-time LLM/keyword pass), and grouped rendering in `renderBasket` + the copy-to-clipboard output. The copy order should follow this list so the pasted list matches store aisles. → **M7/M8** (data model + basket UI; the ingest-side auto-classification is the bigger piece).
+
+4. **Filter the basket by who added it (user(s) / auto).** `standard_basket.added_by` already records the adder (`ME`), and auto/suggested items are distinguishable. Add a filter control (chips: everyone / me / partner / auto) over `renderBasket`. Small, mostly client-side. → **M8**, or bundle with #3 since both touch `renderBasket`.
+
+5. **Expand a recipe from the basket to see its steps.** A "+" on basket rows that came from a recipe, opening the recipe's short steps (the `steps` field added in M6.2). Requires tracking which basket items trace to which recipe/plan (the menu→basket flow in `loadMenuSection`); today the standing basket is product-centric and doesn't keep the recipe link per item, so this needs that provenance wired through. → **M6/M7** (depends on the menu→basket provenance).
+
+---
+
 ## Cross‑cutting foundations (introduce during M5–M8, not a separate milestone)
 
 - **Schema in repo** from now on; migrations directory is the source of truth (C5).
