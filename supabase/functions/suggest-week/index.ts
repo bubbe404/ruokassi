@@ -89,7 +89,7 @@ ${p.lib.map((r) => `- ${r.id}: ${r.name} [${r.tags.join(", ") || "no tags"}]${r.
 
 The week needs ${p.dinners} dinners total.${p.keepIds.length ? ` Already chosen (keep these and count them toward the rules): ids ${p.keepIds.join(", ")}.` : ""} Propose ${p.need} more dinner(s) so the full week satisfies the rules.
 
-Prefer filling "picks" from the library (do not repeat an id already chosen, and no duplicates). Optionally add up to 3 novel recipe ideas that fit the rules/season and add variety (ingredient lines in Finnish: amount + item). If the library cannot satisfy the rules, lean on novel and return fewer picks. Call the submit_week tool with your plan.`;
+Prefer filling "picks" from the library (do not repeat an id already chosen, and no duplicates). Optionally add up to 3 novel recipe ideas that fit the rules/season and add variety (ingredient lines in Finnish: amount + item). For each novel idea also give time_min (total minutes), a short Finnish cooking method, and 2-5 short Finnish steps. If the library cannot satisfy the rules, lean on novel and return fewer picks. Call the submit_week tool with your plan.`;
 }
 
 // S8: a forced tool schema — the model returns structured input, so there is no
@@ -116,6 +116,9 @@ const TOOL = {
             effort: { type: "string", enum: EFFORTS },
             season: { type: ["string", "null"], enum: [...SEASONS, null] },
             ingredients: { type: "array", items: { type: "string" } },
+            time_min: { type: "integer", description: "Total time in minutes." },
+            method: { type: "string", description: "Short cooking method in Finnish, e.g. 'uunissa', 'liedellä', 'yhden padan'." },
+            steps: { type: "array", items: { type: "string" }, description: "2-5 short cooking steps in Finnish." },
           },
           required: ["name", "is_vegetarian", "ingredients"],
         },
@@ -171,6 +174,9 @@ function cleanNovel(arr: any): any[] {
     effort: EFFORTS.includes(n?.effort) ? n.effort : "normal",
     season: SEASONS.includes(n?.season) ? n.season : null,
     ingredients: Array.isArray(n?.ingredients) ? n.ingredients.map((x: any) => String(x)).filter(Boolean).slice(0, 40) : [],
+    time_min: Number.isFinite(Number(n?.time_min)) && Number(n.time_min) > 0 ? Math.min(600, Math.round(Number(n.time_min))) : null,
+    method: n?.method ? String(n.method).slice(0, 60) : null,
+    steps: Array.isArray(n?.steps) ? n.steps.map((x: any) => String(x).trim()).filter(Boolean).slice(0, 8) : [],
   })).filter((n: any) => n.name);
 }
 
