@@ -33,7 +33,11 @@ from email import policy
 import parser as receipt_parser
 
 IMAP_HOST = 'imap.gmail.com'
-GM_QUERY = 'from:s-kaupat.fi subject:kuitti'
+# Gmail matches whole words, not substrings: the real receipt subject is
+# "Tässä kuittisi …", and subject:kuitti does NOT match subject:kuittisi — so the
+# old query returned nothing and no receipt was ever ingested over IMAP. Match the
+# actual word (same query the working device-side ingestion uses).
+GM_QUERY = 'from:s-kaupat.fi subject:kuittisi'
 
 
 def _find_all_mail(M):
