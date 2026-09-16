@@ -205,9 +205,10 @@ Deno.serve(async (req) => {
     const note = String(body.note || "").slice(0, 500);
     const lunches = !!body.lunches;
     const prefs = String(body.prefs || "").slice(0, 500);
-    const produce: string[] = (Array.isArray(body.season_produce) ? body.season_produce : [])
-      .filter((x: any) => typeof x === "string")
-      .map((x: string) => x.trim().slice(0, 40))
+    const rawProduce: unknown[] = Array.isArray(body.season_produce) ? body.season_produce : [];
+    const produce: string[] = rawProduce
+      .filter((x): x is string => typeof x === "string")
+      .map((x) => x.trim().slice(0, 40))
       .filter(Boolean)
       .slice(0, 15);
 
