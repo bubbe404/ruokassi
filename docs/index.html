@@ -782,12 +782,52 @@ async function loadSlots(){
 }
 
 // ---------- SUGGEST WEEK (M4.1 heuristic; LLM engine slots in at M4.2) ----------
-function currentHoliday(){ const m=new Date().getMonth()+1, d=new Date().getDate();
+// N3: the old Easter window was "all of March plus 1-15 April" — too early, and it
+// missed a late Easter entirely (Easter Sunday moves between 22 March and 25 April).
+// Anonymous Gregorian algorithm; local midnight so the comparison is date-only.
+function easterSunday(y){
+  const a=y%19, b=Math.floor(y/100), c=y%100, d=Math.floor(b/4), e=b%4,
+        f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30,
+        i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7,
+        m=Math.floor((a+11*h+22*l)/451),
+        mo=Math.floor((h+l-7*m+114)/31), da=((h+l-7*m+114)%31)+1;
+  return new Date(y, mo-1, da);
+}
+function currentHoliday(){ const now=new Date(), m=now.getMonth()+1, d=now.getDate();
   if(m===12) return 'christmas';
-  if(m===3||(m===4&&d<=15)) return 'easter';
+  // Easter week: Palm Sunday through Easter Monday.
+  const e=easterSunday(now.getFullYear()), from=new Date(e), to=new Date(e);
+  from.setDate(e.getDate()-7); to.setDate(e.getDate()+1);
+  const today0=new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if(today0>=from && today0<=to) return 'easter';
   if((m===4&&d>=20)||(m===5&&d<=5)) return 'vappu';
   if(m===6&&d>=15) return 'midsummer';
   return null; }
+
+// Finnish seasonal produce by month (1-12). Distinct from the holiday `season` tag:
+// this nudges toward what is actually good and cheap right now. Defined once here —
+// the heuristic scores against it and it is sent to the edge function for the prompt.
+const SEASONAL_PRODUCE = {
+  1:['juurekset','lanttu','palsternakka','kaali','peruna','sipuli','omena','sitrushedelmät'],
+  2:['juurekset','lanttu','palsternakka','kaali','peruna','sipuli','sitrushedelmät'],
+  3:['juurekset','kaali','peruna','sipuli','versot'],
+  4:['parsa','raparperi','nokkonen','varhaiset vihannekset','salaatti'],
+  5:['parsa','raparperi','retiisi','salaatti','varhaisperuna','kevätsipuli'],
+  6:['uudet perunat','herne','härkäpapu','mansikka','salaatti','retiisi','tilli'],
+  7:['mansikka','herne','kesäkurpitsa','uudet perunat','tomaatti','kukkakaali','mustaherukka','tilli'],
+  8:['tomaatti','kesäkurpitsa','kantarelli','mustikka','puolukka','punajuuri','kaali','maissi','luumu'],
+  9:['sienet','kurpitsa','punajuuri','juurekset','omena','puolukka','kaali','palsternakka'],
+  10:['kurpitsa','juurekset','lehtikaali','sienet','omena','punajuuri','kaali'],
+  11:['juurekset','lehtikaali','kaali','palsternakka','omena','lanttu'],
+  12:['juurekset','kaali','lanttu','peruna','omena','sitrushedelmät'],
+};
+function inSeasonProduce(){ return SEASONAL_PRODUCE[new Date().getMonth()+1] || []; }
+// A recipe "uses" in-season produce if its name mentions any of it. Names are the only
+// thing loaded for every recipe; ingredients are not, so this stays a nudge, not a rule.
+function producePoints(r){
+  const n=(r&&r.name||'').toLowerCase();
+  return inSeasonProduce().some(w=>n.includes(w.toLowerCase().split(' ')[0])) ? 25 : 0;
+}
 let novelProposals=[];   // LLM-proposed recipes not in the library yet (M4.2)
 function showWhy(text){ const el=$('#suggestWhy'); if(!el) return; if(text){ el.textContent='✨ '+text; el.hidden=false; } else { el.textContent=''; el.hidden=true; } }
 async function suggestWeek(){
@@ -801,7 +841,7 @@ async function suggestWeek(){
     // Try the LLM edge function; fall back to the local heuristic on any failure.
     try{
       const { data, error } = await sb.functions.invoke('suggest-week',
-        { body:{ plan_id:curPlan.id, dinners:curPlan.dinners, need, keep_recipe_ids: slots.map(s=>s.recipe_id), note, prefs, lunches } });
+        { body:{ plan_id:curPlan.id, dinners:curPlan.dinners, need, keep_recipe_ids: slots.map(s=>s.recipe_id), note, prefs, lunches, season_produce: inSeasonProduce() } });
       if(!error && data && !data.fallback && (Array.isArray(data.picks)||Array.isArray(data.novel))){
         const picks=(data.picks||[]).slice(0,need);
         if(picks.length){ const base=nextSlot()-1;
@@ -835,7 +875,7 @@ async function suggestWeekHeuristic(need){
   const holiday=currentHoliday(); const today=new Date();
   const daysSince=w=> w? Math.max(0,(today-new Date(w+'T00:00:00'))/86400000) : 3650;
   const seasonScore=r=> !r.season?0:(r.season===holiday?60:-1e6);   // out-of-season holiday recipes excluded
-  const score=r=> daysSince(lastWeek[r.id]) + seasonScore(r) + Math.random()*4;
+  const score=r=> daysSince(lastWeek[r.id]) + seasonScore(r) + producePoints(r) + Math.random()*4;
   let pool=recipes.filter(r=>!r.is_bread_centric && !r.disliked && !inWeek.has(r.id) && seasonScore(r)>-1000)
                   .sort((a,b)=>score(b)-score(a));
   const cnt={veg:0,fish:0,tomato:0,legume:0,freezer:0};

@@ -32,6 +32,9 @@ const MODELS = (Deno.env.get("SUGGEST_MODEL") || "claude-haiku-4-5-20251001,clau
 
 const EFFORTS = ["quick", "normal", "long"];
 const SEASONS = ["easter", "vappu", "midsummer", "christmas"];
+// How many novel ideas the model may propose. The prompt and cleanNovel() both
+// read this, so raising it is a one-line change (M, 2026-09-08: "7, not 3").
+const NOVEL_MAX = 7;
 
 function json(o: unknown, status = 200) {
   return new Response(JSON.stringify(o), { status, headers: { ...cors, "content-type": "application/json" } });
@@ -64,12 +67,15 @@ function tagList(r: any): string[] {
 }
 function buildPrompt(p: {
   dinners: number; need: number; keepIds: number[]; lib: any[]; today: string;
-  note: string; lunches: boolean; prefs: string;
+  note: string; lunches: boolean; prefs: string; produce: string[];
 }): string {
   const ctx: string[] = [];
   if (p.note) ctx.push(`This week's note (respect it — guests, travel, eating out, requests): ${p.note}`);
   ctx.push(p.lunches ? "The family also wants lunches this week — lean a little toward batch/leftover-friendly dinners." : "Dinners only this week.");
   if (p.prefs) ctx.push(`Standing household food preferences (likes / dislikes / avoid): ${p.prefs}`);
+  // Seasonal produce nudge: in-season Finnish veg is better and cheaper. Distinct from
+  // the holiday `season` tag, which is about Christmas/Easter dishes.
+  if (p.produce.length) ctx.push(`In season in Finland right now: ${p.produce.join(", ")}. Favour dinners built on these, and prefer them when proposing novel ideas.`);
   return `You are planning weekly family dinners for a Finnish family (2 adults + 2 young children). Today is ${p.today}.
 
 House rules:
@@ -89,7 +95,7 @@ ${p.lib.map((r) => `- ${r.id}: ${r.name} [${r.tags.join(", ") || "no tags"}]${r.
 
 The week needs ${p.dinners} dinners total.${p.keepIds.length ? ` Already chosen (keep these and count them toward the rules): ids ${p.keepIds.join(", ")}.` : ""} Propose ${p.need} more dinner(s) so the full week satisfies the rules.
 
-Prefer filling "picks" from the library (do not repeat an id already chosen, and no duplicates). Optionally add up to 3 novel recipe ideas that fit the rules/season and add variety (ingredient lines in Finnish: amount + item). For each novel idea also give time_min (total minutes), a short Finnish cooking method, and 2-5 short Finnish steps. If the library cannot satisfy the rules, lean on novel and return fewer picks. Call the submit_week tool with your plan.`;
+Prefer filling "picks" from the library (do not repeat an id already chosen, and no duplicates). Optionally add up to ${NOVEL_MAX} novel recipe ideas that fit the rules/season and add variety (ingredient lines in Finnish: amount + item). For each novel idea also give time_min (total minutes), a short Finnish cooking method, and 2-5 short Finnish steps. If the library cannot satisfy the rules, lean on novel and return fewer picks. Call the submit_week tool with your plan.`;
 }
 
 // S8: a forced tool schema — the model returns structured input, so there is no
@@ -134,7 +140,7 @@ async function anthropicOnce(model: string, prompt: string) {
     method: "POST",
     headers: { "x-api-key": AK, "anthropic-version": "2023-06-01", "content-type": "application/json" },
     body: JSON.stringify({
-      model, max_tokens: 2000,
+      model, max_tokens: 4000,
       tools: [TOOL], tool_choice: { type: "tool", name: "submit_week" },
       messages: [{ role: "user", content: prompt }],
     }),
@@ -163,7 +169,7 @@ async function callAnthropic(prompt: string) {
 }
 function cleanNovel(arr: any): any[] {
   if (!Array.isArray(arr)) return [];
-  return arr.slice(0, 3).map((n: any) => ({
+  return arr.slice(0, NOVEL_MAX).map((n: any) => ({
     name: String(n?.name || "").slice(0, 120),
     is_vegetarian: !!n?.is_vegetarian,
     has_fish: !!n?.has_fish,
@@ -199,6 +205,11 @@ Deno.serve(async (req) => {
     const note = String(body.note || "").slice(0, 500);
     const lunches = !!body.lunches;
     const prefs = String(body.prefs || "").slice(0, 500);
+    const produce: string[] = (Array.isArray(body.season_produce) ? body.season_produce : [])
+      .filter((x: any) => typeof x === "string")
+      .map((x: string) => x.trim().slice(0, 40))
+      .filter(Boolean)
+      .slice(0, 15);
 
     const recipes = await rest(
       `recipes?select=id,name,is_vegetarian,has_fish,has_legume,has_tomato_sauce,freezer_ok,is_bread_centric,effort,season,disliked&disliked=eq.false&order=name`,
@@ -215,7 +226,7 @@ Deno.serve(async (req) => {
     if (!lib.length) return json({ error: "empty_library", fallback: true });
 
     const today = new Date().toISOString().slice(0, 10);
-    const { ai, model: usedModel } = await callAnthropic(buildPrompt({ dinners, need, keepIds, lib, today, note, lunches, prefs }));
+    const { ai, model: usedModel } = await callAnthropic(buildPrompt({ dinners, need, keepIds, lib, today, note, lunches, prefs, produce }));
 
     // S8: valid library ids only; drop anything already chosen; dedupe; cap to need.
     const libIds = new Set(lib.map((l: any) => l.id));
