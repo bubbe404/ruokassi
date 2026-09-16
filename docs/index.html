@@ -251,7 +251,7 @@
     </section>
 
     <div id="lastUpdate" style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.66rem;padding:20px 0 0"></div>
-    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:6px 0 6px">ruokassi · build 2026-09-16-a · 13:05 EEST</div>
+    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:6px 0 6px">ruokassi · build 2026-09-16-b · 15:40 EEST</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -502,6 +502,7 @@ async function saveQty(b){ await w(()=>sb.from('standard_basket').update({defaul
 async function loadSuggestions(inIds){
   const { data } = await q(()=>sb.from('product_frequency')
     .select('product,product_id,due_ratio,median_qty')
+    .eq('exclude_from_reorder',false)
     .gte('due_ratio',0.9).gte('pct_of_orders',0.25).lt('pct_of_orders',0.5)
     .order('due_ratio',{ascending:false}).limit(20));
   const sug=(data||[]).filter(s=>!inIds.includes(s.product_id)).slice(0,8);
@@ -567,6 +568,7 @@ $('#copyBtn').addEventListener('click',()=>{
 async function loadDue(){
   const { data, error } = await q(()=>sb.from('product_frequency')
     .select('product,last_ordered,days_since_last,median_days_between,median_qty,due_ratio,pct_of_orders')
+    .eq('exclude_from_reorder',false)
     .gte('pct_of_orders',0.25).gte('due_ratio',0.8).order('due_ratio',{ascending:false}).limit(60));
   if(error) return fail('#dueList',error);
   if(!data.length){ $('#dueList').innerHTML='<li class="empty"><span class="big">✅</span>'+t('due.empty')+'</li>'; return; }

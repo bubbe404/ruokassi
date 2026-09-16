@@ -124,6 +124,7 @@ def run(args):
 
     n_ok = n_bad = n_skip = n_fail = 0
     new_missing = []   # orders (parsed dicts) newly ingested that have missing items
+    ingested = []      # (order_id, order_date) newly written, newest of which refreshes the basket
     failures = []
 
     for mid, recv_iso, raw in source:
@@ -158,6 +159,7 @@ def run(args):
                 supa.upsert_order(p, source_message_id=mid)
                 supa.record_email(mid, p['subject'], recv_iso, p['receipt_type'],
                                   p['order_id'], raw.decode('utf-8', 'replace'), True)
+                ingested.append((p['order_id'], p['order_date']))
                 if p['missing_items']:
                     new_missing.append(p)
             except Exception as e:
@@ -174,6 +176,30 @@ def run(args):
 
     log(f'[done] ingested_ok={n_ok} not_reconciled={n_bad} '
         f'skipped_dupes={n_skip} parse_failures={n_fail}')
+
+    # The standing basket follows the receipt: correct the quantities from what was
+    # actually bought, adopt anything that has become a staple, and drop the manual
+    # one-offs someone added during the week just ordered for. Only the newest
+    # receipt drives this (refresh_basket enforces that), so a backfill is safe.
+    if not dry and ingested:
+        newest_id, newest_date = max(ingested, key=lambda x: x[1])
+        try:
+            res = supa.refresh_basket(newest_id)
+            if res.skipped:
+                log(f'[basket] skipped: {res.skipped}')
+            else:
+                for name, by, added in res.removed:
+                    log(f'[basket] removed manual: {name} (added {added} by {by})')
+                for name, old_q, new_q in res.requantified:
+                    log(f'[basket] qty {name}: {old_q} -> {new_q}')
+                for name, qty, seen in res.added:
+                    log(f'[basket] adopted staple: {name} x{qty} ({seen}/8 recent orders)')
+                log(f'[basket] refreshed from {newest_id} ({newest_date}): '
+                    f'removed={len(res.removed)} requantified={len(res.requantified)} '
+                    f'added={len(res.added)}')
+        except Exception as e:
+            # never fail the ingest over the basket — the receipts are the point
+            log(f'[basket] refresh failed (receipts are unaffected): {e}')
 
     # notifications
     if send_email:
