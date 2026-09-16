@@ -107,6 +107,43 @@ def local_fetch(directory):
         yield mid, None, raw
 
 
+def refresh_basket_and_log(supa, order_id, order_date):
+    """Run the basket refresh and print what it changed. Never raises: the receipts
+    are the point of this job, and a basket problem must not fail the run."""
+    try:
+        res = supa.refresh_basket(order_id)
+        if res.skipped:
+            log(f'[basket] skipped: {res.skipped}')
+            return
+        for name, by, added in res.removed:
+            log(f'[basket] removed manual: {name} (added {added} by {by})')
+        for name, old_q, new_q in res.requantified:
+            log(f'[basket] qty {name}: {old_q} -> {new_q}')
+        for name, qty, seen in res.added:
+            log(f'[basket] adopted staple: {name} x{qty} ({seen}/8 recent orders)')
+        log(f'[basket] refreshed from {order_id} ({order_date}): '
+            f'removed={len(res.removed)} requantified={len(res.requantified)} '
+            f'added={len(res.added)}')
+    except Exception as e:
+        log(f'[basket] refresh failed (receipts are unaffected): {e}')
+
+
+def refresh_basket_only():
+    """--refresh-basket: reconcile the basket against the newest receipt already in
+    the database, without touching Gmail. For running the rule on demand instead of
+    waiting for the next receipt to arrive."""
+    from supa import Supa
+    supa = Supa()
+    rows = supa._get('orders', {'select': 'order_id,order_date',
+                                'order': 'order_date.desc', 'limit': 1})
+    if not rows:
+        log('[basket] no orders in the database')
+        return 1
+    log(f'[basket] refreshing against {rows[0]["order_id"]} ({rows[0]["order_date"]})')
+    refresh_basket_and_log(supa, rows[0]['order_id'], rows[0]['order_date'])
+    return 0
+
+
 # ---------- orchestration --------------------------------------------------
 def run(args):
     dry = args.dry_run
@@ -183,23 +220,7 @@ def run(args):
     # receipt drives this (refresh_basket enforces that), so a backfill is safe.
     if not dry and ingested:
         newest_id, newest_date = max(ingested, key=lambda x: x[1])
-        try:
-            res = supa.refresh_basket(newest_id)
-            if res.skipped:
-                log(f'[basket] skipped: {res.skipped}')
-            else:
-                for name, by, added in res.removed:
-                    log(f'[basket] removed manual: {name} (added {added} by {by})')
-                for name, old_q, new_q in res.requantified:
-                    log(f'[basket] qty {name}: {old_q} -> {new_q}')
-                for name, qty, seen in res.added:
-                    log(f'[basket] adopted staple: {name} x{qty} ({seen}/8 recent orders)')
-                log(f'[basket] refreshed from {newest_id} ({newest_date}): '
-                    f'removed={len(res.removed)} requantified={len(res.requantified)} '
-                    f'added={len(res.added)}')
-        except Exception as e:
-            # never fail the ingest over the basket — the receipts are the point
-            log(f'[basket] refresh failed (receipts are unaffected): {e}')
+        refresh_basket_and_log(supa, newest_id, newest_date)
 
     # notifications
     if send_email:
@@ -224,8 +245,13 @@ def main():
     ap.add_argument('--backfill', action='store_true', help='IMAP: full history')
     ap.add_argument('--backfill-local', metavar='DIR', help='ingest *.eml from a folder')
     ap.add_argument('--dry-run', action='store_true', help='parse + reconcile only')
+    ap.add_argument('--refresh-basket', action='store_true',
+                    help='only reconcile the standing basket against the newest receipt already stored')
     ap.add_argument('--limit', type=int, help='cap number of messages (testing)')
-    sys.exit(run(ap.parse_args()))
+    args = ap.parse_args()
+    if args.refresh_basket:
+        sys.exit(refresh_basket_only())
+    sys.exit(run(args))
 
 
 if __name__ == '__main__':

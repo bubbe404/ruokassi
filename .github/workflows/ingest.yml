@@ -11,7 +11,7 @@ on:
         description: "run mode"
         default: "daily"
         type: choice
-        options: [daily, backfill, dry-run]
+        options: [daily, backfill, dry-run, refresh-basket]
 
 concurrency:
   group: ingest
@@ -38,5 +38,6 @@ jobs:
           case "${{ github.event.inputs.mode }}" in
             backfill) python ingest.py --backfill ;;
             dry-run)  python ingest.py --backfill --dry-run ;;
+            refresh-basket) python ingest.py --refresh-basket ;;
             *)        python ingest.py --since 14 ;;
           esac
