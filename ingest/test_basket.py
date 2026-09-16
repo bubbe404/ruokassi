@@ -57,6 +57,8 @@ def build(**over):
         items += [{'order_id': o['order_id'], 'product_id': 1, 'qty': 2, 'unit': 'kpl'}]
     for o in orders[:3]:
         items += [{'order_id': o['order_id'], 'product_id': 9, 'qty': 1, 'unit': 'kpl'}]
+    for o in orders[:5]:   # 5/8 — under the 6/8 bar, so must NOT be adopted
+        items += [{'order_id': o['order_id'], 'product_id': 8, 'qty': 1, 'unit': 'kpl'}]
     for o in orders:
         items += [{'order_id': o['order_id'], 'product_id': 7, 'qty': 1, 'unit': 'kpl'}]  # KERÄILY-alike
     items += [
@@ -69,6 +71,7 @@ def build(**over):
         {'product_id': 2, 'median_qty': 5, 'exclude_from_reorder': False},
         {'product_id': 3, 'median_qty': 0.5, 'exclude_from_reorder': False},
         {'product_id': 7, 'median_qty': 1, 'exclude_from_reorder': True},   # a non-product
+        {'product_id': 8, 'median_qty': 1, 'exclude_from_reorder': False},
         {'product_id': 9, 'median_qty': 1, 'exclude_from_reorder': False},
     ]
     basket = [
@@ -102,6 +105,7 @@ def run():
     check(all(pid != 3 for pid, _ in s.patched), 'leaves a weight-based item alone (kg would round to 0/1)')
     check(any(p[0] == 1 for p in s.posted), f'adopts a staple seen in >= {RECUR_MIN} of 8 orders')
     check(all(p[0] != 9 for p in s.posted), 'does not adopt something seen in only 3 of 8')
+    check(all(p[0] != 8 for p in s.posted), f'does not adopt at 5 of 8 (the bar is {RECUR_MIN})')
     check(all(p[2] == 'auto' for p in s.posted), 'adopted rows are marked auto, not attributed to a user')
     check(all(p[0] != 7 for p in s.posted), 'never adopts a product flagged exclude_from_reorder (KERÄILY, PANTTI)')
     check(any(p[0] == 1 and p[1] == 2 for p in s.posted), 'adopts at the median quantity')

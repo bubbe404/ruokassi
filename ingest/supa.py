@@ -14,8 +14,11 @@ KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY', '')
 
 # How the standing basket learns from a receipt: a product bought in at least
 # RECUR_MIN of the last RECUR_WINDOW orders is treated as a staple worth carrying.
+# 6/8 = "most weeks". 4/8 was tried first and would have adopted 15 items in one
+# go, nearly doubling the basket; the due-to-reorder list already surfaces the
+# half-the-time items when they are actually due, so the basket does not need them.
 RECUR_WINDOW = 8
-RECUR_MIN = 4
+RECUR_MIN = 6
 
 
 class BasketRefresh:
