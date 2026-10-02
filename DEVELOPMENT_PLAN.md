@@ -14,6 +14,9 @@ _Date: 2026‑09‑05 · Author: Claude, with a Fable 5.1 code review · Status:
 | 09‑08 #5 recipe steps from basket rows | ⏳ open (needs menu→basket provenance) |
 | **M7** S10 missing items clear once dealt with | ✅ done — migration 0005: `resolution` lifecycle (open → handled / reordered / expired), app ✓ button, ingest closes superseded items and keeps resolutions on re-ingest |
 | **M7** basket leads with missing + "due, not in basket" | ✅ done |
+| Puuttui: ✓ bought in store / ✕ not needed | ✅ done (0006) — a store buy counts in `product_frequency`. Missing-item names are long shop names, receipt lines short ones, so the first ✓ asks once which receipt product it is (`guess_receipt_products` / `link_missing_product`, stored as a `manual` alias). |
+| Loppumassa, ei korissa: ✕ not needed this week | ✅ done (0006) — `suggestion_dismissals` per Monday week |
+| Add-item search at the top of the basket | ✅ done |
 | **M7** "Refresh orders" (header, every tab) | ✅ done — edge function `refresh-orders` dispatches `ingest.yml` with secret `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions R/W; **expires after 1 year**) |
 | M7 in-app "new receipt" banner / Web Push, "time to plan" nudge | ⏳ open |
 | M8 visual polish · M9 auto-submit | ⏳ open |
