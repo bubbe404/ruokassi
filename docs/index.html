@@ -206,6 +206,11 @@
     </section>
 
     <section id="basket" hidden>
+      <div class="searchbar" style="margin-top:0">
+        <input id="addSearch" type="text" placeholder="Lisää tuote koriin…" data-i18n-ph="basket.add_ph">
+      </div>
+      <ul class="results" id="addResults"></ul>
+      <div style="height:14px"></div>
       <div id="missWrap"></div>
       <div id="sugWrap"></div>
       <div id="menuWrap"></div>
@@ -217,10 +222,6 @@
         <button class="fchip" data-bf="auto" data-i18n="basket.filter_auto">auto</button>
       </div>
       <ul class="list" id="basketList"><li class="rowline skeleton" data-i18n="common.loading">Ladataan…</li></ul>
-      <div class="searchbar">
-        <input id="addSearch" type="text" placeholder="Lisää tuote koriin…" data-i18n-ph="basket.add_ph">
-      </div>
-      <ul class="results" id="addResults"></ul>
       <div class="copybar"><button class="copybtn" id="copyBtn" data-i18n="basket.copy">Kopioi valitut</button></div>
       <div class="legend"><span><span class="bychip auto">auto</span> <span data-i18n="basket.legend_auto">historian perusteella</span></span><span><span class="bychip" style="background:hsl(210 45% 42%)">M</span> <span data-i18n="basket.legend_who">kuka lisäsi</span></span></div>
       <p class="hint" data-i18n="basket.hint">Vakioviikkokorisi kappaleina. Rastita mitä tarvitset tällä viikolla, säädä määriä ja kopioi lista S-kauppaan. Muutokset tallentuvat ensi viikoksi. Painon mukaan myytäviä ei voi laskea automaattisesti, joten ne alkavat pieninä — aseta kerran ja ne pysyvät.</p>
@@ -258,7 +259,7 @@
     </section>
 
     <div id="lastUpdate" style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.66rem;padding:20px 0 0"></div>
-    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:6px 0 6px">ruokassi · build 2026-10-02-a · M7</div>
+    <div style="text-align:center;color:var(--faint);font-family:var(--mono);font-size:.6rem;padding:6px 0 6px">ruokassi · build 2026-10-02-b · M7</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
