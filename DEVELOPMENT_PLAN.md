@@ -1,8 +1,24 @@
 # ruokassi — Development plan (post‑M4)
 
-_Date: 2026‑09‑05 · Author: Claude, with a Fable 5.1 code review · Status: proposed_
+_Date: 2026‑09‑05 · Author: Claude, with a Fable 5.1 code review · Status: in progress (updated 2026‑10‑02)_
 
-## Where we are
+## Status — 2026‑10‑02
+
+| Item | State |
+|---|---|
+| M5 hardening (C1–C5, S2) | ✅ done |
+| M5.1 iOS login | ✅ superseded: **one-time email code at every login** (build 2026‑10‑02‑a). Password + magic link removed. Codes via Resend SMTP from `login.mclang.com`; Supabase "Magic Link" template shows `{{ .Token }}` only. |
+| M6 smarter suggestions (reshuffle, prefs, note/lunches, seasonal, tool-use JSON, S7/S8/S9) | ✅ done |
+| 09‑08 #1 seven ideas · #3 aisle grouping (name-keyword, client-side) · #4 who-added filter | ✅ done |
+| 09‑08 #2 trim basket hint | ⏳ open |
+| 09‑08 #5 recipe steps from basket rows | ⏳ open (needs menu→basket provenance) |
+| **M7** S10 missing items clear once dealt with | ✅ done — migration 0005: `resolution` lifecycle (open → handled / reordered / expired), app ✓ button, ingest closes superseded items and keeps resolutions on re-ingest |
+| **M7** basket leads with missing + "due, not in basket" | ✅ done |
+| **M7** "Refresh orders" (header, every tab) | ✅ done — edge function `refresh-orders` dispatches `ingest.yml` with secret `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions R/W; **expires after 1 year**) |
+| M7 in-app "new receipt" banner / Web Push, "time to plan" nudge | ⏳ open |
+| M8 visual polish · M9 auto-submit | ⏳ open |
+
+## Where we are (as of 2026‑09‑05)
 
 M0–M4 are built and live: receipt ingestion, the standing weekly basket, the recipe/meal planner, LLM‑assisted weekly suggestions (Supabase Edge Function + heuristic fallback + feedback loop), the i18n layer (FI/EN, SV stubbed), and a pile of fixes. The app is a single‑file static PWA on GitHub Pages backed by Supabase, used by two people.
 

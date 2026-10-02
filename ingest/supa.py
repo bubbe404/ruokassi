@@ -141,14 +141,28 @@ class Supa:
         if rows:
             self._post('order_items', rows, prefer='return=minimal')
 
+        # Missing items are replaced like the order lines, but a re-ingest of the
+        # same receipt must not reopen what someone already ticked off in the app
+        # (or what a later receipt closed): carry each row's resolution over by name.
+        prev = {r['product_name_raw']: r['resolution'] for r in self._get(
+            'missing_items', {'order_id': f'eq.{p["order_id"]}',
+                              'select': 'product_name_raw,resolution'})}
         self._delete('missing_items', {'order_id': f'eq.{p["order_id"]}'})
         mrows = [{
             'order_id': p['order_id'], 'product_name_raw': m['name'],
             'product_id': self.product_id(m['name']), 'qty': m['qty'],
-            'resolution': 'open',
+            'resolution': prev.get(m['name'], 'open'),
         } for m in p['missing_items']]
         if mrows:
             self._post('missing_items', mrows, prefer='return=minimal')
+
+    def close_superseded_missing(self, order_id):
+        """After a new receipt: close every still-open missing item from earlier
+        orders ('reordered' if this receipt has the product, else 'expired'), so
+        "Missing from last order" only ever shows the newest receipt's gaps.
+        Returns how many rows were closed. Postgres function from migration 0005."""
+        r = self._post('rpc/close_superseded_missing', {'p_order_id': str(order_id)})
+        return r if isinstance(r, int) else 0
 
     # -- the standing basket, after a receipt -------------------------------
     def refresh_basket(self, order_id):

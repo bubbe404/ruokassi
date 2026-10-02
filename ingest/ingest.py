@@ -221,6 +221,12 @@ def run(args):
     if not dry and ingested:
         newest_id, newest_date = max(ingested, key=lambda x: x[1])
         refresh_basket_and_log(supa, newest_id, newest_date)
+        # "Missing from last order": a newer receipt supersedes older gaps.
+        try:
+            n = supa.close_superseded_missing(newest_id)
+            log(f'[missing] closed {n} open item(s) from orders before {newest_id}')
+        except Exception as e:
+            log(f'[missing] close failed (receipts are unaffected): {e}')
 
     # notifications
     if send_email:

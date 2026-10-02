@@ -6,3 +6,8 @@ project_id = "nzpkmtwmdruqcsussxgr"
 # Require a valid Supabase JWT on the LLM suggestion endpoint so only signed-in
 # users (the two household accounts) can spend Anthropic credits.
 verify_jwt = true
+
+[functions.refresh-orders]
+# Only signed-in users may start the ingest job (the function also checks
+# /auth/v1/user, since verify_jwt alone admits the anon key).
+verify_jwt = true
